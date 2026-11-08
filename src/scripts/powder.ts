@@ -6,6 +6,8 @@
   desk?: { x: number; y: number; s: number }; mob?: { x: number; y: number; s: number };
   onPhase?: (info: { n: number; total: number; name: string; phase: string }) => void;
   onProgress?: (u: number) => void;
+  // Optional free band (viewport px) the form must fit inside, e.g. between header and headline.
+  zone?: () => { top: number; bottom: number } | null;
 };
 export function startPowder(o: PowderOpts = {}) {
       let BG = o.bg ?? "#0B0C0D", G = o.grain ?? [214, 218, 220], AL = o.alpha ?? 1;
@@ -106,6 +108,12 @@ export function startPowder(o: PowderOpts = {}) {
         cx = mobile ? W * M.x : W * D.x;
         cy = mobile ? H * M.y : H * D.y;
         S = mobile ? Math.min(W * 0.36, H * M.s) : Math.min(W * 0.2 * (D.s / 0.3), H * D.s);
+        const z = o.zone?.();
+        if (z && z.bottom > z.top) {
+          // Fit the rotating form (about ±1.25·S tall once projected) inside the free band.
+          cy = (z.top + z.bottom) / 2;
+          S = Math.max(40, Math.min(S, (z.bottom - z.top) / 2.6));
+        }
         const n = mobile ? 1500 : 2800;
         if (n !== N) init(n);
       }

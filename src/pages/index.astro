@@ -33,8 +33,8 @@ const email = "teresa@ourosmaterials.com";
       <a href={`mailto:${email}`} class="contact">Contact</a>
     </header>
     <main>
-      <h1>Rebuilding America’s <em>materials frontier.</em></h1>
-      <p>Ouros Materials engineers advanced ceramic hybrids with a proprietary low-temperature process, for resilient building infrastructure, energy and defense.</p>
+      <h1>Rebuilding America’s <br /><em>materials frontier.</em></h1>
+      <p>For thousands of years, ceramics have meant kilns above 1,000°C. Ouros Materials engineers advanced ceramic hybrids with a proprietary low-temperature process, for resilient building infrastructure, energy and defense. Paired with robotics, AI and automation, it opens the door to making materials in America again.</p>
     </main>
     <footer class="mono"><span>Ouros Materials</span><span>New York, New York</span></footer>
   </div>
@@ -51,10 +51,15 @@ const email = "teresa@ourosmaterials.com";
     .b main { align-self: end; justify-self: center; text-align: center; max-width: 1000px; padding-bottom: 5vh; }
     .b h1 { margin: 0; font-family: Newsreader, Georgia, serif; font-weight: 380; font-size: clamp(44px, 6.4vw, 104px); line-height: .98; letter-spacing: -.025em; animation: up 1.4s cubic-bezier(.2,.7,.2,1) both; }
     .b h1 em { font-style: italic; font-weight: 340; }
-    .b p { margin: 26px auto 0; max-width: 520px; font-size: 16px; line-height: 1.55; color: var(--mid); transition: color 1.2s ease; animation: up 1.4s .2s cubic-bezier(.2,.7,.2,1) both; }
+    .b p { margin: 26px auto 0; max-width: 600px; font-size: 16px; line-height: 1.55; color: var(--mid); transition: color 1.2s ease; animation: up 1.4s .2s cubic-bezier(.2,.7,.2,1) both; }
     .b footer { font-size: 11px; letter-spacing: .06em; color: var(--dim); }
+    @media (max-height: 780px) and (min-width: 761px) {
+      .b h1 { font-size: clamp(40px, 5.4vw, 84px); }
+      .b main { padding-bottom: 2vh; }
+    }
     @media (max-width: 760px) {
       .b .logo img { height: 28px; }
+      .b p { font-size: 14px !important; margin-top: 18px; }
       .b main { padding-bottom: 3vh; }
       .b h1 { font-size: 46px; }
       .b p { font-size: 15px; }
@@ -70,7 +75,12 @@ const email = "teresa@ourosmaterials.com";
     };
     const start = PAL[root.dataset.theme as Theme] ?? PAL.day;
     const powder = startPowder({ bg: start.bg, grain: start.grain, alpha: start.alpha, accent: false, marks: false,
-      desk: { x: 0.5, y: 0.3, s: 0.21 }, mob: { x: 0.5, y: 0.29, s: 0.16 } });
+      desk: { x: 0.5, y: 0.3, s: 0.21 }, mob: { x: 0.5, y: 0.29, s: 0.16 },
+      zone: () => {
+        const h = document.querySelector(".b header")?.getBoundingClientRect(), t = document.querySelector(".b h1")?.getBoundingClientRect();
+        return h && t ? { top: h.bottom + 12, bottom: t.top - 16 } : null;
+      } });
+    document.fonts?.ready.then(() => dispatchEvent(new Event("resize")));
 
     let lat = 40, lon = -new Date().getTimezoneOffset() / 4;
     const apply = () => {
