@@ -1,0 +1,97 @@
+---
+import "../styles/global.css";
+import "../styles/site.css";
+const title = "Ouros Materials · Advanced ceramics, reinvented";
+const description =
+  "Ouros Materials develops, qualifies and scales advanced ceramic composites for U.S. energy, defense and infrastructure, made below 250°C.";
+const url = "https://ourosmaterials.com";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={`${url}/og.jpg`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0B0C0D" />
+    <link rel="preload" href="/fonts/haas-regular.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/media/hv4.mp4" as="video" type="video/mp4" />
+  </head>
+  <body>
+    <main class="g" style="position: relative; width: 100%; background: #E9E9E7; color: #151617; font-family: Haas, Helvetica, Arial, sans-serif">
+      <slot />
+    </main>
+    <script>
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      // 1. Scale fixed-size motion graphics to fit their container.
+      const fits = [...document.querySelectorAll<HTMLElement>(".fit")];
+      const fit = () =>
+        fits.forEach((el) => {
+          const w = +el.dataset.w!, h = +el.dataset.h!;
+          const inner = el.querySelector<HTMLElement>(".fit-inner")!;
+          // never shrink below 55%: on phones the graphic becomes swipeable instead
+          const s = Math.max(0.55, Math.min(1, el.clientWidth / w));
+          const scrolls = w * s > el.clientWidth + 1;
+          el.classList.toggle("swipe", scrolls);
+          inner.style.transform = `scale(${s})`;
+          inner.style.marginLeft = scrolls ? "0px" : `${Math.max(0, (el.clientWidth - w * s) / 2)}px`;
+          let sizer = el.querySelector<HTMLElement>(".fit-sizer");
+          if (!sizer) { sizer = document.createElement("div"); sizer.className = "fit-sizer"; el.appendChild(sizer); }
+          sizer.style.width = `${w * s}px`;
+          sizer.style.height = scrolls ? `${h * s}px` : "1px";
+          el.style.height = `${h * s + (scrolls ? 28 : 0)}px`;
+        });
+      fit();
+      addEventListener("resize", fit);
+
+      // 2. Play section animations when they scroll into view; lazy-load videos.
+      const play = (v: HTMLVideoElement) => {
+        if (reduce) return;
+        v.muted = true;
+        v.play().catch(() => {});
+      };
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            const sec = e.target as HTMLElement;
+            const vids = sec.querySelectorAll<HTMLVideoElement>("video");
+            if (e.isIntersecting) {
+              sec.classList.add("in");
+              vids.forEach((v) => {
+                if (v.dataset.src && !v.src) v.src = v.dataset.src;
+                play(v);
+              });
+            } else {
+              vids.forEach((v) => v.pause());
+            }
+          }),
+        { rootMargin: "200px 0px", threshold: 0.01 }
+      );
+      document.querySelectorAll("[data-sec]").forEach((s) => io.observe(s));
+
+      // 3. Composite composer: Polymer / Metal alloy toggle (auto-cycles until clicked).
+      let sel = "poly", manual = false;
+      const label = document.querySelector("[data-phase-label]");
+      const show = (p: string) => {
+        sel = p;
+        document.querySelectorAll<HTMLElement>("[data-phase]").forEach((d) => (d.hidden = d.dataset.phase !== p));
+        document.querySelectorAll<HTMLElement>("[data-pick]").forEach((b) => b.classList.toggle("on", b.dataset.pick === p));
+        if (label) label.textContent = p === "poly" ? "01 / 02 · CERAMIC–POLYMER" : "02 / 02 · CERAMIC–METAL";
+      };
+      document.addEventListener("click", (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLElement>("[data-pick]");
+        if (b) { manual = true; show(b.dataset.pick!); }
+      });
+      if (!reduce) setInterval(() => { if (!manual) show(sel === "poly" ? "metal" : "poly"); }, 6500);
+    </script>
+  </body>
+</html>
