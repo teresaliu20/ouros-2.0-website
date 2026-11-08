@@ -5,7 +5,8 @@
   canvas?: string; bg?: string; grain?: [number, number, number]; accent?: boolean; marks?: boolean; alpha?: number;
   desk?: { x: number; y: number; s: number }; mob?: { x: number; y: number; s: number };
   onPhase?: (info: { n: number; total: number; name: string; phase: string }) => void;
-  onProgress?: (u: number) => void;
+  onProgress?: (u: number, phase: string, pull: number) => void;
+  interactive?: boolean;
   // Optional free band (viewport px) the form must fit inside, e.g. between header and headline.
   zone?: () => { top: number; bottom: number } | null;
 };
@@ -137,6 +138,15 @@ export function startPowder(o: PowderOpts = {}) {
       const ease = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t));
 
       let start = performance.now(), last = start, lastPhase = "";
+      let mx = -9999, my = -9999, mOn = false;
+      if (o.interactive && !reduce) {
+        const mv = (x: number, y: number) => { mx = x; my = y; mOn = true; };
+        addEventListener("pointermove", (e) => mv(e.clientX, e.clientY), { passive: true });
+        addEventListener("touchmove", (e) => { const t = e.touches[0]; if (t) mv(t.clientX, t.clientY); }, { passive: true });
+        addEventListener("pointerleave", () => { mOn = false; });
+        addEventListener("touchend", () => { mOn = false; });
+        document.addEventListener("mouseleave", () => { mOn = false; });
+      }
       function frame(now: number) {
         const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now;
         const t = Math.max(0, (now - start) / 1000);
@@ -158,7 +168,7 @@ export function startPowder(o: PowderOpts = {}) {
           }
           lastPhase = phase;
         }
-        o.onProgress?.(reduce ? 1 : u / CYCLE);
+        o.onProgress?.(reduce ? 1 : u / CYCLE, phase, pull);
 
         // Rotation of the form.
         const ry = t * 0.22 + si * 0.9, cyR = Math.cos(ry), syR = Math.sin(ry), cxR = Math.cos(TILT), sxR = Math.sin(TILT);
@@ -199,6 +209,10 @@ export function startPowder(o: PowderOpts = {}) {
             const hxp = cx + (hx[i] + Math.sin(t * 0.25 + delay[i] * 9) * 0.12) * S, hyp = cy + (hy[i] + Math.cos(t * 0.2 + delay[i] * 7) * 0.1) * S;
             vx[i] += fx * 0.03 + (hxp - x) * 0.004; vy[i] += fy * 0.03 + (hyp - y) * 0.004;
             vx[i] *= 0.93; vy[i] *= 0.93;
+          }
+          if (mOn) {
+            const dx = x - mx, dy = y - my, d2 = dx * dx + dy * dy, R = 110;
+            if (d2 < R * R && d2 > 0.01) { const d = Math.sqrt(d2), f = (1 - d / R) * 3.2; vx[i] += (dx / d) * f; vy[i] += (dy / d) * f; }
           }
           x += vx[i] * dt * 60; y += vy[i] * dt * 60;
           px[i] = x; py[i] = y;
