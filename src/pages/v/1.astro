@@ -1,0 +1,366 @@
+---
+// Version 1 — AIRCO-led. White and black, plant footage, a black product unit, inputs → process → outputs.
+import Version from "../../layouts/Version.astro";
+import Shot from "../../components/v/Shot.astro";
+import { hero, statement, missing, lowTemp, powderToPart, composites, foundry, useCases, how, team, close, nav } from "../../content/site";
+
+// Isometric slab helper for the black product render.
+const C = Math.cos(Math.PI / 6), S = Math.sin(Math.PI / 6);
+const P = (x: number, y: number, z: number, ox: number, oy: number) => [ox + (x - y) * C, oy + (x + y) * S - z];
+const slab = (w: number, d: number, h: number, ox: number, oy: number) => {
+  const pt = (x: number, y: number, z: number) => P(x, y, z, ox, oy).map((v) => v.toFixed(1)).join(",");
+  return {
+    top: `M${pt(0,0,h)} L${pt(w,0,h)} L${pt(w,d,h)} L${pt(0,d,h)} Z`,
+    left: `M${pt(0,d,h)} L${pt(w,d,h)} L${pt(w,d,0)} L${pt(0,d,0)} Z`,
+    right: `M${pt(w,0,h)} L${pt(w,d,h)} L${pt(w,d,0)} L${pt(w,0,0)} Z`,
+  };
+};
+const stack = [0, 1, 2, 3].map((i) => slab(300, 210, 22, 250, 120 + i * 40));
+const unit = slab(150, 110, 70, 150, 40);
+---
+<Version title="Ouros Materials · Version 1" current="1">
+<div class="v1">
+  <header class="hdr" id="hdr">
+    <a href="#top" class="logo" aria-label="Ouros Materials home">
+      <img class="lw" src="/brand/ouros-logo-primary-white.svg" alt="Ouros Materials" width="112" height="36" />
+      <img class="lb" src="/brand/ouros-logo-primary-black.svg" alt="" width="112" height="36" />
+    </a>
+    <nav class="links" aria-label="Sections">
+      {nav.map(([l, h]) => <a href={h}>{l}</a>)}
+      <a class="cta" href={close.email}>Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="top">
+    <Shot k="hero" class="hero-shot" eager />
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-copy wrap">
+      <h1>{hero.title}</h1>
+      <p>{hero.sub}</p>
+    </div>
+  </section>
+
+  <section class="sec why wrap" id="why">
+    <h2 class="h2">{statement.lead}</h2>
+    <p class="lede">{statement.rest}</p>
+  </section>
+
+  <section class="sec product wrap">
+    <div class="product-copy">
+      <h2 class="h1">{powderToPart.title}</h2>
+      <p class="lede">{powderToPart.body}</p>
+      <ul class="parts">{powderToPart.parts.map((p) => <li>{p}</li>)}</ul>
+    </div>
+    <figure class="render" aria-label="Stack of Ouros ceramic composite panels">
+      <svg viewBox="0 0 640 520" role="img" aria-hidden="true">
+        {stack.slice().reverse().map((s) => (
+          <g>
+            <path d={s.left} fill="#0d0d0d" />
+            <path d={s.right} fill="#1c1c1c" />
+            <path d={s.top} fill="#2a2a2a" stroke="#4a4a4a" stroke-width="1" />
+          </g>
+        ))}
+      </svg>
+    </figure>
+  </section>
+
+  <section class="sec system" id="materials">
+    <div class="wrap">
+      <h2 class="h1 narrow">{composites.title}</h2>
+      <div class="flow" role="img" aria-label="Inputs flow into the Ouros process and come out as two composite families">
+        <div class="col inputs">
+          {composites.inputs.map(([n, d]) => (
+            <div class="node"><span class="dot" aria-hidden="true"></span><strong>{n}</strong><span>{d}</span></div>
+          ))}
+        </div>
+        <div class="wire" aria-hidden="true"><i></i></div>
+        <div class="col core">
+          <svg viewBox="0 0 300 230" aria-hidden="true" class="unit">
+            <path d={unit.left} fill="#0d0d0d" /><path d={unit.right} fill="#1c1c1c" /><path d={unit.top} fill="#262626" stroke="#444" />
+          </svg>
+          <strong>{composites.process}</strong>
+          <span>Under 250°C, no kiln</span>
+        </div>
+        <div class="wire" aria-hidden="true"><i></i></div>
+        <div class="col outputs">
+          {composites.families.map((f) => (
+            <div class="node"><span class="dot" aria-hidden="true"></span><strong>{f.name}</strong><span>{f.status || "Available for programs"}</span></div>
+          ))}
+        </div>
+      </div>
+      <div class="families">
+        {composites.families.map((f) => (
+          <article>
+            <h3>{f.name}{f.status && <em> {f.status}</em>}</h3>
+            <ul class="traits">{f.traits.map((t) => <li>{t}</li>)}</ul>
+            <p class="uses">{f.uses.join(", ")}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sec heat wrap">
+    <h2 class="h1">{lowTemp.title}</h2>
+    <div class="pair">
+      <figure><Shot k="kiln" class="ar" /><figcaption><span class="num">1,300°C</span><span>Kiln-fired ceramics, the way it has been done for millennia</span></figcaption></figure>
+      <figure><Shot k="cure" class="ar" /><figcaption><span class="num">&lt;250°C</span><span>Ouros solidification, with no kiln</span></figcaption></figure>
+    </div>
+    <p class="lede">{lowTemp.body}</p>
+  </section>
+
+  <section class="sec gap">
+    <div class="wrap">
+      <h2 class="h1 narrow">{missing.title}</h2>
+      <p class="lede">{missing.body}</p>
+      <div class="stages">
+        {missing.stages.map((s, i) => (
+          <div class={`stage ${i === 1 ? "mid" : ""}`}>
+            <h3>{s.name}</h3>
+            <p class="state">{s.state}</p>
+            <ul>{s.items.map(([a, b]) => <li><span>{a}</span><span>{b}</span></li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <p class="answer">{missing.answer}</p>
+    </div>
+  </section>
+
+  <section class="sec foundry wrap" id="foundry">
+    <div class="split">
+      <h2 class="h1">{foundry.title}</h2>
+      <p class="lede">{foundry.body}</p>
+    </div>
+    <div class="cards">
+      {foundry.steps.map((s, i) => (
+        <article>
+          <Shot k={s.shot} class="card-shot" />
+          <h3><span class="idx">{i + 1}</span>{s.name}</h3>
+          <p>{s.body}</p>
+        </article>
+      ))}
+    </div>
+    <p class="data"><strong>Data layer.</strong> {foundry.data}</p>
+  </section>
+
+  <section class="sec where wrap">
+    <h2 class="h1 narrow">{useCases.title}</h2>
+    <div class="grid4">
+      {useCases.items.map((u) => (
+        <article>
+          <Shot k={u.shot} class="use-shot" />
+          <h3>{u.name}</h3>
+          <p>{u.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="sec how" id="how">
+    <div class="wrap">
+      <div class="split">
+        <h2 class="h1">{how.title}</h2>
+        <p class="lede">{how.body}</p>
+      </div>
+      <ol class="steps">
+        {how.steps.map((s) => (
+          <li><span class="phase">{s.phase}</span><h3>{s.name}</h3><p>{s.body}</p></li>
+        ))}
+      </ol>
+      <div class="who">
+        <p>We work with</p>
+        <ul>{how.who.map((w) => <li>{w}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec team wrap" id="team">
+    <h2 class="h1 narrow">{team.title}</h2>
+    <div class="founders">
+      {team.founders.map((p) => (
+        <article><div class="ph" aria-hidden="true">{p.init}</div><h3>{p.name}</h3><p class="role">{p.role}</p><p>{p.bio}</p></article>
+      ))}
+    </div>
+    <h3 class="sub">Advisors</h3>
+    <div class="advisors">
+      {team.advisors.map((p) => (
+        <article><div class="ph sm" aria-hidden="true">{p.init}</div><h3>{p.name}</h3><p class="role">{p.role}</p><p>{p.bio}</p></article>
+      ))}
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <h2>{close.title}</h2>
+      <a class="btn" href={close.email}>{close.cta}</a>
+      <div class="foot-row">
+        <a href={close.linkedin}>LinkedIn</a>
+        <a href={close.email}>Contact</a>
+        <span>{close.place}</span>
+        <span>© 2026 Ouros Materials</span>
+      </div>
+      <img class="bigmark" src="/brand/ouros-logo-primary-white.svg" alt="" />
+    </div>
+  </footer>
+</div>
+
+<style is:global>
+  .v1 { --ink: #000; --paper: #fff; --steel: #6b6e72; --rule: #e4e4e2; --panel: #f4f4f3; background: var(--paper); color: var(--ink); font: 400 17px/1.5 Inter, "Helvetica Neue", Arial, sans-serif; font-feature-settings: "ss01", "cv11"; }
+  .v1 .wrap { max-width: 1320px; margin: 0 auto; padding-left: clamp(20px, 4vw, 48px); padding-right: clamp(20px, 4vw, 48px); }
+  .v1 .sec { padding-top: clamp(96px, 12vw, 168px); }
+  .v1 .h1 { font-weight: 600; font-size: clamp(36px, 4.4vw, 64px); line-height: 1.02; letter-spacing: -0.035em; margin: 0; }
+  .v1 .h2 { font-weight: 600; font-size: clamp(30px, 3.4vw, 50px); line-height: 1.08; letter-spacing: -0.03em; margin: 0; max-width: 18ch; }
+  .v1 .narrow { max-width: 20ch; }
+  .v1 .lede { color: var(--steel); font-size: clamp(17px, 1.35vw, 20px); line-height: 1.5; max-width: 54ch; margin: 24px 0 0; }
+  .v1 h3 { font-weight: 600; letter-spacing: -0.015em; }
+
+  /* Header */
+  .v1 .hdr { position: fixed; top: 0; left: 0; right: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 18px clamp(20px, 4vw, 48px); transition: background .25s, border-color .25s; border-bottom: 1px solid transparent; }
+  .v1 .hdr .logo { position: relative; display: block; width: 112px; height: 36px; }
+  .v1 .hdr .logo img { position: absolute; inset: 0; width: 112px; height: auto; transition: opacity .25s; }
+  .v1 .hdr .lb { opacity: 0; }
+  .v1 .hdr .links { display: flex; gap: 28px; align-items: center; font-size: 15px; }
+  .v1 .hdr .links a { color: #fff; text-decoration: none; transition: color .25s; }
+  .v1 .hdr .links .cta { border: 1px solid currentColor; padding: 8px 14px; border-radius: 2px; }
+  .v1 .hdr.solid { background: rgba(255,255,255,.96); border-bottom-color: var(--rule); }
+  .v1 .hdr.solid .lw { opacity: 0; } .v1 .hdr.solid .lb { opacity: 1; }
+  .v1 .hdr.solid .links a { color: var(--ink); }
+  @media (max-width: 860px) { .v1 .hdr .links a:not(.cta) { display: none; } }
+
+  /* Hero */
+  .v1 .hero { position: relative; height: 100svh; min-height: 620px; color: #fff; overflow: hidden; }
+  .v1 .hero-shot { position: absolute; inset: 0; }
+  .v1 .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,.05) 55%, rgba(0,0,0,.62) 100%); pointer-events: none; }
+  .v1 .hero-copy { position: absolute; left: 0; right: 0; bottom: clamp(56px, 8vh, 96px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 32px; align-items: end; }
+  .v1 .hero h1 { margin: 0; font-weight: 600; font-size: clamp(52px, 8.4vw, 138px); line-height: .94; letter-spacing: -0.05em; max-width: 11ch; }
+  .v1 .hero p { margin: 0; font-size: 16px; line-height: 1.5; color: rgba(255,255,255,.88); }
+  .v1 .hero .shot-tag { top: 84px; bottom: auto; left: clamp(20px, 4vw, 48px); }
+  @media (max-width: 760px) { .v1 .hero-copy { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Why */
+  .v1 .why { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+  .v1 .why .lede { margin-top: 6px; font-size: clamp(19px, 1.6vw, 24px); color: #303236; }
+  @media (max-width: 860px) { .v1 .why { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+
+  /* Product render */
+  .v1 .product { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 40px; align-items: center; }
+  .v1 .render { margin: 0; }
+  .v1 .render svg { width: 100%; height: auto; display: block; }
+  .v1 .parts { list-style: none; padding: 0; margin: 36px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+  .v1 .parts li { padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 16px; }
+  .v1 .parts li:nth-child(odd) { padding-right: 16px; }
+  @media (max-width: 860px) { .v1 .product { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Inputs → process → outputs */
+  .v1 .system { background: var(--panel); margin-top: clamp(96px, 12vw, 168px); padding-bottom: clamp(80px, 10vw, 140px); }
+  .v1 .flow { margin-top: 64px; display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1fr) 80px minmax(0, 1fr); align-items: center; }
+  .v1 .flow .col { display: flex; flex-direction: column; gap: 18px; }
+  .v1 .flow .node { position: relative; background: #fff; border: 1px solid var(--rule); padding: 18px 20px 18px 36px; display: flex; flex-direction: column; gap: 4px; }
+  .v1 .flow .node strong { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+  .v1 .flow .node span:not(.dot) { color: var(--steel); font-size: 14.5px; }
+  .v1 .flow .dot { position: absolute; left: 16px; top: 25px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+  .v1 .flow .core { align-items: center; text-align: center; gap: 6px; }
+  .v1 .flow .core .unit { width: min(100%, 260px); height: auto; }
+  .v1 .flow .core strong { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .v1 .flow .core span { color: var(--steel); font-size: 14.5px; }
+  .v1 .wire { height: 1px; background: #b9b9b6; position: relative; }
+  .v1 .wire i { position: absolute; right: -1px; top: -3px; width: 7px; height: 7px; border-top: 1px solid #8d8d8a; border-right: 1px solid #8d8d8a; transform: rotate(45deg); }
+  .v1 .families { margin-top: 72px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+  .v1 .families article { border-top: 2px solid var(--ink); padding-top: 18px; }
+  .v1 .families h3 { margin: 0 0 14px; font-size: 22px; }
+  .v1 .families h3 em { font-style: normal; font-weight: 500; font-size: 14px; color: var(--steel); margin-left: 6px; }
+  .v1 .traits { list-style: none; padding: 0; margin: 0; }
+  .v1 .traits li { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .v1 .uses { color: var(--steel); font-size: 15px; margin: 14px 0 0; }
+  @media (max-width: 960px) {
+    .v1 .flow { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .v1 .wire { width: 1px; height: 40px; margin: 0 auto; }
+    .v1 .wire i { right: -3px; top: auto; bottom: -1px; transform: rotate(135deg); }
+    .v1 .families { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* Heat */
+  .v1 .pair { margin-top: 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .v1 .pair figure { margin: 0; }
+  .v1 .pair .ar { aspect-ratio: 4 / 3; border-radius: 4px; }
+  .v1 .pair figcaption { display: flex; flex-direction: column; gap: 4px; padding-top: 16px; color: var(--steel); font-size: 15px; }
+  .v1 .pair .num { color: var(--ink); font-weight: 600; font-size: clamp(40px, 5vw, 72px); letter-spacing: -0.04em; line-height: 1; }
+  @media (max-width: 760px) { .v1 .pair { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Missing middle */
+  .v1 .stages { margin-top: 56px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--ink); }
+  .v1 .stage { padding: 22px 24px 28px 0; }
+  .v1 .stage + .stage { padding-left: 24px; border-left: 1px solid var(--rule); }
+  .v1 .stage.mid { background: var(--ink); color: #fff; border-left-color: var(--ink); }
+  .v1 .stage h3 { margin: 0; font-size: 20px; }
+  .v1 .stage .state { margin: 4px 0 18px; color: var(--steel); font-size: 15px; }
+  .v1 .stage.mid .state { color: #bdbdbd; }
+  .v1 .stage ul { list-style: none; padding: 0; margin: 0; }
+  .v1 .stage li { display: flex; flex-direction: column; padding: 10px 0; border-top: 1px solid var(--rule); }
+  .v1 .stage.mid li { border-top-color: #333; }
+  .v1 .stage li span + span { color: var(--steel); font-size: 14.5px; }
+  .v1 .stage.mid li span + span { color: #a9a9a9; }
+  .v1 .answer { margin: 40px 0 0; font-size: clamp(22px, 2vw, 30px); font-weight: 600; letter-spacing: -0.02em; max-width: 32ch; line-height: 1.2; }
+  @media (max-width: 860px) { .v1 .stages { grid-template-columns: minmax(0, 1fr); } .v1 .stage + .stage { border-left: 0; padding-left: 0; } .v1 .stage.mid { padding-left: 16px; padding-right: 16px; } }
+
+  /* Foundry cards */
+  .v1 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+  .v1 .split .lede { margin: 0; }
+  @media (max-width: 860px) { .v1 .split { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+  .v1 .cards { margin-top: 56px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .v1 .card-shot { aspect-ratio: 4 / 3; border-radius: 6px; }
+  .v1 .cards h3 { margin: 18px 0 6px; font-size: 20px; display: flex; gap: 10px; align-items: baseline; }
+  .v1 .cards .idx { font: 600 13px/1 GeistMono, monospace; color: var(--steel); }
+  .v1 .cards p { margin: 0; color: var(--steel); font-size: 15.5px; }
+  .v1 .data { margin: 40px 0 0; padding-top: 18px; border-top: 1px solid var(--rule); color: var(--steel); max-width: 70ch; }
+  .v1 .data strong { color: var(--ink); font-weight: 600; }
+  @media (max-width: 860px) { .v1 .cards { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Uses */
+  .v1 .grid4 { margin-top: 56px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .v1 .use-shot { aspect-ratio: 3 / 4; border-radius: 6px; }
+  .v1 .grid4 h3 { margin: 16px 0 4px; font-size: 19px; }
+  .v1 .grid4 p { margin: 0; color: var(--steel); font-size: 15px; }
+  @media (max-width: 960px) { .v1 .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .v1 .grid4 { grid-template-columns: minmax(0, 1fr); } .v1 .use-shot { aspect-ratio: 4 / 3; } }
+
+  /* How */
+  .v1 .how .steps { list-style: none; padding: 0; margin: 56px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; counter-reset: s; border-top: 1px solid var(--ink); }
+  .v1 .how .steps li { padding: 22px 24px 0 0; counter-increment: s; }
+  .v1 .how .steps li + li { padding-left: 24px; border-left: 1px solid var(--rule); }
+  .v1 .how .steps li::before { content: counter(s); display: block; font: 600 13px/1 GeistMono, monospace; color: var(--steel); margin-bottom: 18px; }
+  .v1 .how .phase { font-size: 14px; color: var(--steel); }
+  .v1 .how h3 { margin: 4px 0 8px; font-size: 21px; }
+  .v1 .how .steps p { margin: 0; color: #3c3e42; font-size: 15.5px; }
+  .v1 .who { margin-top: 56px; display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline; color: var(--steel); }
+  .v1 .who p { margin: 0; }
+  .v1 .who ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 12px; flex-wrap: wrap; }
+  .v1 .who li { color: var(--ink); border: 1px solid var(--rule); padding: 8px 12px; border-radius: 2px; font-size: 15px; }
+  @media (max-width: 860px) { .v1 .how .steps { grid-template-columns: minmax(0, 1fr); } .v1 .how .steps li + li { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule); margin-top: 22px; } }
+
+  /* Team */
+  .v1 .team { padding-bottom: clamp(96px, 12vw, 160px); }
+  .v1 .founders { margin-top: 56px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .v1 .advisors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .v1 .team .ph { aspect-ratio: 4 / 5; background: var(--panel); display: flex; align-items: flex-end; padding: 16px; font-size: 40px; font-weight: 600; letter-spacing: -0.03em; color: #c9c9c6; border-radius: 4px; }
+  .v1 .team .ph.sm { aspect-ratio: 1 / 1; font-size: 28px; }
+  .v1 .team article h3 { margin: 14px 0 2px; font-size: 19px; }
+  .v1 .team .role { margin: 0 0 8px; color: var(--steel); font-size: 14.5px; }
+  .v1 .team article p:last-child { margin: 0; font-size: 15px; color: #3c3e42; }
+  .v1 .team .sub { margin: 64px 0 20px; font-size: 15px; font-weight: 600; padding-top: 16px; border-top: 1px solid var(--rule); }
+  @media (max-width: 860px) { .v1 .founders { grid-template-columns: minmax(0, 1fr); } .v1 .advisors { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* Footer */
+  .v1 .foot { background: #000; color: #fff; padding: clamp(96px, 12vw, 160px) 0 120px; overflow: hidden; }
+  .v1 .foot h2 { margin: 0; font-weight: 600; font-size: clamp(36px, 4.4vw, 64px); line-height: 1.02; letter-spacing: -0.035em; max-width: 18ch; }
+  .v1 .btn { display: inline-block; margin-top: 36px; background: #fff; color: #000; text-decoration: none; padding: 14px 20px; font-weight: 600; font-size: 15px; border-radius: 2px; }
+  .v1 .foot-row { margin-top: 96px; display: flex; gap: 28px; flex-wrap: wrap; color: #9a9a9a; font-size: 14.5px; border-top: 1px solid #262626; padding-top: 20px; }
+  .v1 .foot-row a { color: #fff; text-decoration: none; }
+  .v1 .bigmark { width: min(100%, 860px); height: auto; margin-top: 56px; opacity: .95; }
+</style>
+<script>
+  const hdr = document.getElementById("hdr")!;
+  const hero = document.querySelector(".v1 .hero")!;
+  new IntersectionObserver(([e]) => hdr.classList.toggle("solid", !e.isIntersecting), { rootMargin: "-72px 0px 0px 0px" }).observe(hero);
+</script>
+</Version>

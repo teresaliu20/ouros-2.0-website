@@ -1,0 +1,302 @@
+---
+// Version 3 — Vulcan-led. Light grain-grey, plain Inter, grayscale imagery, label | text rows, an orbiting card hero.
+import Version from "../../layouts/Version.astro";
+import Shot from "../../components/v/Shot.astro";
+import { hero, statement, missing, lowTemp, powderToPart, composites, foundry, useCases, how, team, close, nav, type ShotKey } from "../../content/site";
+
+const cards: ShotKey[] = ["powder", "press", "cnc", "hands", "torch", "bench", "robopress", "line", "energy", "defense"];
+const words = powderToPart.title.split(" ");
+const uses = [...new Set(composites.families.flatMap((f) => f.uses))];
+---
+<Version title="Ouros Materials · Version 3" current="3" theme="#F2F2F0">
+<div class="v3">
+  <header class="bar">
+    <div class="pill">
+      <a href="#top" class="brand"><img src="/brand/ouros-logomark-black.svg" alt="" width="26" height="12" /><span>Ouros Materials</span></a>
+      <nav aria-label="Sections">{nav.map(([l, h]) => <a href={h}>{l}</a>)}</nav>
+    </div>
+    <a class="pill contact" href={close.email}>Contact us</a>
+  </header>
+
+  <section class="orbit" id="top">
+    <div class="o-stage">
+      <div class="o-cards" aria-hidden="true">
+        {cards.map((k, i) => <div class="o-card" style={`--i:${i}`}><Shot k={k} /></div>)}
+      </div>
+      <img class="o-mark" src="/brand/ouros-logomark-black.svg" alt="" aria-hidden="true" />
+      <div class="o-copy">
+        <h1>{hero.title}</h1>
+        <p>{hero.sub}</p>
+      </div>
+      <p class="o-tag shot-tag">Hero cards: stills from shots 02–17</p>
+    </div>
+  </section>
+
+  <section class="row wrap" id="why">
+    <h2 class="lab">{statement.lead}</h2>
+    <p class="big">{statement.rest}</p>
+  </section>
+
+  <section class="reveal wrap" id="materials">
+    <h2 class="huge" aria-label={powderToPart.title}>{words.map((w) => <span class="w" aria-hidden="true">{w} </span>)}</h2>
+    <div class="techs">
+      <div><h3>Parts</h3><ul>{powderToPart.parts.map((p) => <li>{p}</li>)}</ul></div>
+      <div><h3>Applications</h3><ul class="cols">{uses.map((u) => <li>{u}</li>)}</ul></div>
+    </div>
+  </section>
+
+  <section class="cap wrap">
+    <h2 class="huge">{composites.title}</h2>
+    <div class="row inner">
+      <h3 class="lab">{lowTemp.title}</h3>
+      <div>
+        <p class="big">{lowTemp.body}</p>
+        <div class="links">
+          {composites.families.map((f) => (
+            <details>
+              <summary><span class="dot" aria-hidden="true"></span>{f.name}{f.status && <em>{f.status}</em>}<span class="pm" aria-hidden="true"></span></summary>
+              <ul>{f.traits.map((t) => <li>{t}</li>)}</ul>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+    <Shot k="line" class="wide" />
+  </section>
+
+  <section class="row wrap">
+    <h2 class="lab">{missing.title}</h2>
+    <div>
+      <p class="big">{missing.body}</p>
+      <div class="stages">
+        {missing.stages.map((s, i) => (
+          <div class={i === 1 ? "mid" : ""}><h3>{s.name}</h3><p>{s.state}</p></div>
+        ))}
+      </div>
+      <p class="big ink">{missing.answer}</p>
+    </div>
+  </section>
+
+  <section class="row wrap" id="foundry">
+    <h2 class="lab">Ouros Foundry</h2>
+    <div>
+      <p class="big ink">{foundry.title}</p>
+      <p class="big">{foundry.body}</p>
+    </div>
+  </section>
+  <div class="trio wrap">
+    {foundry.steps.map((s) => <article><Shot k={s.shot} class="t-shot" /><h3>{s.name}</h3><p>{s.body}</p></article>)}
+  </div>
+  <p class="data wrap">{foundry.data}</p>
+
+  <section class="row wrap">
+    <h2 class="lab">Where it goes</h2>
+    <p class="big ink">{useCases.title}</p>
+  </section>
+  <div class="quad wrap">
+    {useCases.items.map((u) => <article><Shot k={u.shot} class="q-shot" /><h3>{u.name}</h3><p>{u.body}</p></article>)}
+  </div>
+
+  <section class="acc wrap" id="how">
+    <div class="acc-head">
+      <h2 class="huge">{how.title}</h2>
+      <p class="big">{how.body}</p>
+    </div>
+    <div class="acc-list">
+      {how.steps.map((s, i) => (
+        <details open={i === 0}>
+          <summary><span class="n">{i + 1}</span>{s.name}<span class="pm" aria-hidden="true"></span></summary>
+          <div class="acc-body"><p class="phase">{s.phase}</p><p>{s.body}</p></div>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section class="team wrap" id="team">
+    <h2 class="huge">{team.title}</h2>
+    <div class="t-rows">
+      {[...team.founders, ...team.advisors].map((p, i) => (
+        <article class={i < 3 ? "f" : "a"}><h3>{p.name}</h3><p class="role">{p.role}</p><p>{p.bio}</p></article>
+      ))}
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="f-top"><img src="/brand/ouros-logo-primary-black.svg" alt="Ouros Materials" width="180" /><p>{close.title}</p></div>
+      <div class="f-links">
+        <a href={close.email}>{close.cta}</a>
+        <a href={close.linkedin}>LinkedIn</a>
+        <a href="#team">Team</a>
+        <a href="#how">How we work</a>
+      </div>
+      <div class="f-legal"><span>{close.place}</span><span>© 2026 Ouros Materials</span></div>
+    </div>
+  </footer>
+</div>
+
+<style is:global>
+  .v3 { --field: #F2F2F0; --ink: #000; --mid: #7a7a76; --rule: #d3d3cf; --card: #e6e6e3; background: var(--field); color: var(--ink); font: 400 17px/1.5 Inter, "Helvetica Neue", Arial, sans-serif; letter-spacing: -0.006em; }
+  .v3::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: .1; mix-blend-mode: multiply; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .8 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .v3 .wrap { max-width: 1280px; margin: 0 auto; padding-left: clamp(20px, 3vw, 36px); padding-right: clamp(20px, 3vw, 36px); }
+  .v3 .shot img { filter: grayscale(1) contrast(1.04) brightness(1.04); }
+  .v3 h1, .v3 h2, .v3 h3 { font-weight: 500; }
+
+  /* Bar */
+  .v3 .bar { position: fixed; z-index: 60; top: 12px; left: clamp(12px, 2vw, 22px); right: clamp(12px, 2vw, 22px); display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+  .v3 .pill { pointer-events: auto; display: flex; align-items: center; gap: 18px; background: rgba(232,232,229,.82); backdrop-filter: blur(10px); border-radius: 4px; padding: 9px 14px; font-size: 13.5px; }
+  .v3 .pill a { text-decoration: none; }
+  .v3 .pill nav { display: flex; gap: 16px; padding-left: 16px; border-left: 1px solid #c9c9c5; }
+  .v3 .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .v3 .contact { font-weight: 500; }
+  @media (max-width: 860px) { .v3 .pill nav { display: none; } }
+
+  /* Orbit hero */
+  .v3 .orbit { height: 260vh; position: relative; }
+  .v3 .o-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; }
+  .v3 .o-cards { position: absolute; inset: 0; }
+  .v3 .o-card { position: absolute; left: 50%; top: 50%; width: clamp(120px, 15vw, 230px); aspect-ratio: 4 / 3; margin: calc(clamp(120px, 15vw, 230px) * -0.375) 0 0 calc(clamp(120px, 15vw, 230px) * -0.5); will-change: transform; }
+  .v3 .o-card .shot { width: 100%; height: 100%; border-radius: 6px; }
+  .v3 .o-card .shot img { animation: none; filter: grayscale(.25) sepia(.08) contrast(1.02); }
+  .v3 .o-card .shot-tag { display: none; }
+  .v3 .o-mark { position: absolute; width: clamp(80px, 9vw, 130px); opacity: 0; transition: opacity .2s; }
+  .v3 .o-copy { position: relative; z-index: 2; text-align: center; padding: 0 20px; transition: opacity .2s; }
+  .v3 .o-copy h1 { margin: 0; font-size: clamp(40px, 5.2vw, 80px); line-height: 1.02; letter-spacing: -0.035em; }
+  .v3 .o-copy p { margin: 18px auto 0; max-width: 46ch; color: #4a4a47; font-size: 16px; }
+  .v3 .o-tag { left: 50%; transform: translateX(-50%); bottom: 72px; }
+
+  /* Rows */
+  .v3 .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 48px; padding-top: 22px; margin-top: clamp(72px, 9vw, 120px); border-top: 1px solid var(--rule); }
+  .v3 .row.inner { margin-top: 64px; }
+  .v3 .lab { margin: 0; font-size: 19px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; max-width: 22ch; }
+  .v3 .big { margin: 0; font-size: clamp(20px, 1.7vw, 25px); line-height: 1.36; color: #6b6b67; max-width: 40ch; letter-spacing: -0.012em; }
+  .v3 .big.ink { color: var(--ink); }
+  .v3 .big + .big, .v3 .stages + .big { margin-top: 22px; }
+  @media (max-width: 860px) { .v3 .row { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
+
+  /* Reveal headline */
+  .v3 .reveal { margin-top: clamp(96px, 12vw, 160px); }
+  .v3 .huge { margin: 0; font-size: clamp(40px, 5.4vw, 84px); line-height: 1.0; letter-spacing: -0.04em; max-width: 16ch; }
+  .v3 .reveal .w { color: #c4c4c0; transition: color .35s; }
+  .v3 .reveal .w.on { color: var(--ink); }
+  .v3 .techs { margin-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 48px; }
+  .v3 .techs h3 { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--mid); }
+  .v3 .techs ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid #a9a9a5; }
+  .v3 .techs li { padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 15px; }
+  .v3 .techs .cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  @media (max-width: 760px) { .v3 .techs { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Capability */
+  .v3 .cap { margin-top: clamp(120px, 14vw, 200px); }
+  .v3 .links { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; max-width: 520px; }
+  .v3 details summary { list-style: none; cursor: pointer; }
+  .v3 details summary::-webkit-details-marker { display: none; }
+  .v3 .links details { background: #e6e6e3; border-radius: 3px; }
+  .v3 .links summary { display: flex; align-items: center; gap: 12px; padding: 13px 16px; font-size: 15px; font-weight: 500; }
+  .v3 .links summary em { font-style: normal; color: var(--mid); font-weight: 400; margin-left: 2px; }
+  .v3 .links .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); flex: none; }
+  .v3 .pm { margin-left: auto; width: 12px; height: 12px; position: relative; flex: none; }
+  .v3 .pm::before, .v3 .pm::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; background: currentColor; transition: transform .2s; }
+  .v3 .pm::after { transform: rotate(90deg); }
+  .v3 details[open] .pm::after { transform: rotate(0); }
+  .v3 .links ul { margin: 0; padding: 0 16px 12px 34px; color: #4a4a47; font-size: 15px; }
+  .v3 .links li { padding: 3px 0; }
+  .v3 .wide { margin-top: 56px; aspect-ratio: 21 / 9; border-radius: 4px; }
+  @media (max-width: 640px) { .v3 .wide { aspect-ratio: 4 / 3; } }
+
+  /* Missing middle stages */
+  .v3 .stages { margin-top: 28px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #a9a9a5; }
+  .v3 .stages > div { padding: 14px 16px 16px 0; }
+  .v3 .stages > div + div { padding-left: 16px; border-left: 1px solid var(--rule); }
+  .v3 .stages h3 { margin: 0; font-size: 15px; font-weight: 600; }
+  .v3 .stages p { margin: 2px 0 0; font-size: 14.5px; color: var(--mid); }
+  .v3 .stages .mid { background: var(--ink); color: #fff; border-left-color: var(--ink) !important; }
+  .v3 .stages .mid p { color: #bdbdb9; }
+  @media (max-width: 640px) { .v3 .stages { grid-template-columns: minmax(0, 1fr); } .v3 .stages > div + div { border-left: 0; padding-left: 0; } .v3 .stages .mid { padding-left: 12px !important; } }
+
+  /* Trio and quad */
+  .v3 .trio, .v3 .quad { margin-top: 48px; display: grid; gap: 16px; }
+  .v3 .trio { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .v3 .quad { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .v3 .t-shot { aspect-ratio: 4 / 3; border-radius: 4px; }
+  .v3 .q-shot { aspect-ratio: 1 / 1; border-radius: 4px; }
+  .v3 .trio h3, .v3 .quad h3 { margin: 14px 0 4px; font-size: 17px; font-weight: 600; }
+  .v3 .trio p, .v3 .quad p { margin: 0; font-size: 15px; color: #55554f; }
+  .v3 .data { margin-top: 32px; color: var(--mid); font-size: 15px; max-width: 70ch; }
+  @media (max-width: 960px) { .v3 .quad { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 640px) { .v3 .trio, .v3 .quad { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Accordion */
+  .v3 .acc { margin-top: clamp(120px, 14vw, 200px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+  .v3 .acc .big { margin-top: 24px; }
+  .v3 .acc-list { border-top: 1px solid #a9a9a5; }
+  .v3 .acc-list details { border-bottom: 1px solid var(--rule); }
+  .v3 .acc-list summary { display: flex; align-items: baseline; gap: 14px; padding: 18px 0; font-size: clamp(20px, 1.7vw, 24px); font-weight: 500; letter-spacing: -0.02em; }
+  .v3 .acc-list .n { font-size: 14px; color: var(--mid); font-weight: 500; width: 14px; }
+  .v3 .acc-list details:not([open]) summary { color: #9a9a96; }
+  .v3 .acc-body { padding: 0 0 20px 28px; }
+  .v3 .acc-body p { margin: 0; max-width: 46ch; }
+  .v3 .acc-body .phase { color: var(--mid); font-size: 14px; margin-bottom: 6px; }
+  @media (max-width: 860px) { .v3 .acc { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+
+  /* Team */
+  .v3 .team { margin-top: clamp(120px, 14vw, 200px); }
+  .v3 .t-rows { margin-top: 48px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; border-top: 1px solid #a9a9a5; }
+  .v3 .t-rows article { padding: 16px 0 24px; border-bottom: 1px solid var(--rule); }
+  .v3 .t-rows article.a { grid-column: auto; }
+  .v3 .t-rows h3 { margin: 0; font-size: 18px; font-weight: 600; }
+  .v3 .t-rows .role { margin: 0 0 8px; color: var(--mid); font-size: 14px; }
+  .v3 .t-rows p:last-child { margin: 0; font-size: 15px; color: #4a4a47; }
+  @media (max-width: 860px) { .v3 .t-rows { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Footer */
+  .v3 .foot { margin-top: clamp(120px, 14vw, 200px); background: #e8e8e5; padding: 72px 0 96px; }
+  .v3 .f-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 48px; align-items: start; }
+  .v3 .f-top p { margin: 0; font-size: clamp(26px, 2.6vw, 40px); line-height: 1.1; letter-spacing: -0.03em; max-width: 20ch; }
+  .v3 .f-links { margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; border-top: 1px solid #a9a9a5; }
+  .v3 .f-links a { text-decoration: none; padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: clamp(18px, 1.6vw, 22px); }
+  .v3 .f-legal { margin-top: 40px; display: flex; gap: 28px; color: var(--mid); font-size: 13.5px; }
+  @media (max-width: 760px) { .v3 .f-top, .v3 .f-links { grid-template-columns: minmax(0, 1fr); } }
+</style>
+<script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Orbit hero: cards spread wide at first, then converge and turn around the mark as you scroll.
+  const orbit = document.querySelector<HTMLElement>(".v3 .orbit")!;
+  const cards = [...orbit.querySelectorAll<HTMLElement>(".o-card")];
+  const mark = orbit.querySelector<HTMLElement>(".o-mark")!;
+  const copy = orbit.querySelector<HTMLElement>(".o-copy")!;
+  const N = cards.length;
+  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+  const draw = () => {
+    const span = orbit.offsetHeight - innerHeight;
+    const p = reduce ? 0 : Math.min(1, Math.max(0, -orbit.getBoundingClientRect().top / span));
+    const e = ease(p);
+    const W = innerWidth, H = innerHeight;
+    cards.forEach((c, i) => {
+      const a0 = (i / N) * Math.PI * 2 + 0.35;
+      const a = a0 + e * 1.2;
+      const rx = (W * 0.44) * (1 - e) + Math.min(W, H) * 0.24 * e;
+      const ry = (H * 0.40) * (1 - e) + Math.min(W, H) * 0.24 * e;
+      const x = Math.cos(a) * rx, y = Math.sin(a) * ry;
+      const s = 1 - 0.5 * e;
+      const rot = (a * 180) / Math.PI * e + (i % 2 ? -14 : 12) * (1 - e);
+      c.style.transform = `translate(${x}px, ${y}px) rotate(${rot}deg) scale(${s})`;
+      c.style.opacity = String(1 - Math.max(0, (e - 0.85) / 0.15) * 0.2);
+    });
+    mark.style.opacity = String(Math.max(0, (e - 0.45) / 0.35));
+    copy.style.opacity = String(1 - Math.min(1, e / 0.45));
+  };
+  addEventListener("scroll", draw, { passive: true }); addEventListener("resize", draw); draw();
+
+  // Word-by-word reveal for the big statement.
+  const ws = [...document.querySelectorAll<HTMLElement>(".v3 .reveal .w")];
+  const head = document.querySelector<HTMLElement>(".v3 .reveal .huge")!;
+  const rev = () => {
+    const r = head.getBoundingClientRect();
+    const p = reduce ? 1 : Math.min(1, Math.max(0, (innerHeight * 0.85 - r.top) / (innerHeight * 0.5)));
+    const k = Math.round(p * ws.length);
+    ws.forEach((w, i) => w.classList.toggle("on", i < k));
+  };
+  addEventListener("scroll", rev, { passive: true }); rev();
+</script>
+</Version>

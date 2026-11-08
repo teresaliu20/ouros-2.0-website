@@ -1,0 +1,15 @@
+---
+// A shot slot. Shows the stand-in still (graded) with a slow push-in, plus a shot label in drafts.
+// When the real clip exists, pass `video` and it plays muted on loop with the still as poster.
+import { shots, img, type ShotKey } from "../../content/site";
+interface Props { k: ShotKey; class?: string; style?: string; video?: string; eager?: boolean; alt?: string }
+const { k, class: cls = "", style = "", video, eager = false, alt = "" } = Astro.props;
+const s = shots[k];
+const label = `Shot ${String(s.n).padStart(2, "0")}: ${s.title}`;
+---
+<figure class={`shot ${cls}`} style={style} data-shot={s.n}>
+  {video
+    ? <video src={video} poster={img(k)} autoplay muted loop playsinline preload="metadata" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>
+    : <img src={img(k)} alt={alt} loading={eager ? "eager" : "lazy"} decoding="async" />}
+  <figcaption class="shot-tag">{label}</figcaption>
+</figure>

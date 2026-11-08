@@ -1,0 +1,68 @@
+---
+// Shared shell for the site versions under /v/. Draft-only: noindex, version switcher, shot labels.
+const { title = "Ouros Materials · Advanced ceramics, reinvented", current = "1", theme = "#ffffff" } = Astro.props;
+const versions = [
+  ["Current draft", "/preview/", "0"],
+  ["1 · AIRCO", "/v/1/", "1"],
+  ["2 · AMCA", "/v/2/", "2"],
+  ["3 · Vulcan", "/v/3/", "3"],
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content={theme} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <style is:global>
+      @font-face { font-family: "Inter"; src: url("/fonts/inter-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+      @font-face { font-family: "GeistMono"; src: url("/fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+      @font-face { font-family: "Newsreader"; src: url("/fonts/newsreader-var.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+      @font-face { font-family: "Newsreader"; src: url("/fonts/newsreader-var-italic.woff2") format("woff2"); font-weight: 200 800; font-style: italic; font-display: swap; }
+      *, *::before, *::after { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+      a { color: inherit; }
+      img { display: block; max-width: 100%; }
+      :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+      /* Shot slots: stand-in still with a slow push-in until the real clip exists */
+      .shot { position: relative; overflow: hidden; margin: 0; background: #888; }
+      .shot > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 55%; animation: push 16s ease-in-out infinite alternate; }
+      @keyframes push { from { transform: scale(1.0); } to { transform: scale(1.07); } }
+      .shot-tag { position: absolute; left: 10px; bottom: 10px; z-index: 3; font: 600 11px/1.2 GeistMono, ui-monospace, monospace; letter-spacing: .02em; color: #fff; background: rgba(0,0,0,.62); padding: 6px 8px; border-radius: 3px; max-width: calc(100% - 20px); }
+      html.noshots .shot-tag { display: none; }
+
+      /* Version switcher */
+      .vswitch { position: fixed; z-index: 1000; left: 50%; bottom: 16px; transform: translateX(-50%); display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(20,20,20,.86); backdrop-filter: blur(8px); font: 500 12.5px/1 Inter, system-ui, sans-serif; box-shadow: 0 6px 24px rgba(0,0,0,.18); white-space: nowrap; }
+      .vswitch a, .vswitch button { color: #d9d9d9; text-decoration: none; padding: 9px 12px; border-radius: 999px; border: 0; background: none; font: inherit; cursor: pointer; }
+      .vswitch a[aria-current="page"] { background: #fff; color: #000; }
+      .vswitch button { color: #9a9a9a; border-left: 1px solid #3a3a3a; border-radius: 0 999px 999px 0; }
+      @media (max-width: 640px) { .vswitch { font-size: 11.5px; bottom: 10px; } .vswitch a, .vswitch button { padding: 8px 8px; } .vswitch .long { display: none; } }
+
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+    </style>
+  </head>
+  <body>
+    <slot />
+    <nav class="vswitch" aria-label="Site versions">
+      {versions.map(([label, href, id]) => (
+        <a href={href} aria-current={id === current ? "page" : undefined}>{label}</a>
+      ))}
+      <button type="button" id="shotToggle" aria-pressed="true"><span class="long">Shot </span>labels</button>
+    </nav>
+    <script is:inline>
+      (function () {
+        var b = document.getElementById("shotToggle"), h = document.documentElement;
+        var off = false; try { off = localStorage.getItem("ouros-noshots") === "1"; } catch (e) {}
+        var set = function (o) { h.classList.toggle("noshots", o); b.setAttribute("aria-pressed", String(!o)); b.style.color = o ? "#6a6a6a" : "#d9d9d9"; };
+        set(off);
+        b.addEventListener("click", function () { off = !off; set(off); try { localStorage.setItem("ouros-noshots", off ? "1" : "0"); } catch (e) {} });
+      })();
+    </script>
+  </body>
+</html>

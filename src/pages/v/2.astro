@@ -1,0 +1,356 @@
+---
+// Version 2 — AMCA-led. Paper and graphite, Newsreader serif, a sticky scroll story told in line art.
+import Version from "../../layouts/Version.astro";
+import Shot from "../../components/v/Shot.astro";
+import { hero, statement, missing, lowTemp, powderToPart, composites, foundry, useCases, how, team, close, nav } from "../../content/site";
+
+const beats = [
+  { text: statement.lead, note: "Steel, aluminum, nylon, fiberglass, the transistor, optical fiber." },
+  { text: "Then the labs that made them were broken up, and the factories moved overseas.", note: "Invention stayed. Production left." },
+  { text: missing.title, note: missing.body },
+  { text: missing.stall, note: "Pilot lines, testing and qualification: the middle that no one funds." },
+  { text: missing.answer, note: "Automated R&D, in-house testing and pilot manufacturing under one roof." },
+  { text: "For 30,000 years, ceramics have meant fire.", note: "Kilns run at 1,000–1,400°C. That heat rules out polymers and metals inside the ceramic." },
+  { text: "Our solidification chemistry works at a fraction of the heat.", note: "Under 250°C, polymers, and eventually metals, live inside a ceramic matrix." },
+  { text: powderToPart.title, note: powderToPart.body },
+];
+const eras = [
+  ["Steel", 1856], ["Aluminum", 1886], ["Fiberglass", 1932], ["Nylon", 1935], ["Transistor", 1947], ["Optical fiber", 1970],
+] as const;
+const X = (y: number) => 60 + ((y - 1850) / (1990 - 1850)) * 420; // timeline 1850–1990 → x 60–480
+---
+<Version title="Ouros Materials · Version 2" current="2" theme="#ECEBE6">
+<div class="v2">
+  <header class="card-nav" id="cardnav">
+    <a href="#top" class="mark" aria-label="Ouros Materials home"><img src="/brand/ouros-logomark-black.svg" alt="Ouros Materials" width="44" height="19" /></a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="menu-list"><span class="sr">Menu</span><i></i><i></i></button>
+    <nav id="menu-list" aria-label="Sections">
+      {nav.map(([l, h]) => <a href={h}>{l}</a>)}
+      <a href={close.email}>Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="top">
+    <Shot k="hands" class="hero-shot" eager />
+    <h1>{hero.title}</h1>
+    <p class="hero-sub">{hero.sub}</p>
+    <img class="hero-word" src="/brand/ouros-wordmark-line-black.svg" alt="" />
+  </section>
+
+  <section class="story" id="why" style={`--n:${beats.length}`}>
+    <div class="stage">
+      <div class="art" aria-hidden="true">
+        <p class="art-note"></p>
+        <svg viewBox="0 0 540 420" class="lines">
+          <!-- 0–1: timeline of eras -->
+          <g class="b b0 b1">
+            <line x1="40" y1="230" x2="500" y2="230" class="ln" />
+            {Array.from({ length: 15 }, (_, i) => 1850 + i * 10).map((y) => (
+              <g><line x1={X(y)} y1="224" x2={X(y)} y2="236" class="ln" />{y % 20 === 10 && <text x={X(y)} y="256" class="tx c">{y}</text>}</g>
+            ))}
+            {eras.map(([n, y], i) => (
+              <g class="era">
+                <line x1={X(y)} y1="230" x2={X(y)} y2={i % 2 ? 300 - i * 6 : 160 - i * 12} class="ln" />
+                <circle cx={X(y)} cy="230" r="4" class="dot" />
+                <text x={X(y) + 6} y={i % 2 ? 296 - i * 6 : 166 - i * 12} class="tx">{n}</text>
+              </g>
+            ))}
+            <g class="exit">
+              <path d="M490 230 C 520 230, 520 120, 540 100" class="ln dash" />
+              <text x="532" y="88" class="tx" text-anchor="end">Factories move offshore</text>
+            </g>
+          </g>
+          <!-- 2–4: invention → missing middle → manufacturing -->
+          <g class="b b2 b3 b4">
+            <circle cx="90" cy="210" r="46" class="ln" /><text x="90" y="214" class="tx c">Invention</text>
+            <circle cx="450" cy="210" r="46" class="ln dash" /><text x="450" y="214" class="tx c">Factories</text>
+            <g class="gapbox"><rect x="170" y="150" width="200" height="120" rx="6" class="ln dash" />
+            <text x="270" y="140" class="tx c">The missing middle</text></g>
+            <line x1="136" y1="210" x2="170" y2="210" class="ln" /><line x1="370" y1="210" x2="404" y2="210" class="ln dash" />
+            <g class="stalled">{[0,1,2,3,4,5,6,7,8].map((i) => <rect x={186 + (i % 5) * 34} y={246 - Math.floor(i / 5) * 18} width="26" height="12" class="ln" />)}<text x="270" y="300" class="tx c">Materials on the shelf</text></g>
+            <g class="bridge">
+              {["Automated R&D", "In-house testing", "Pilot manufacturing"].map((t, i) => (
+                <g><rect x={182 + i * 62} y="176" width="52" height="52" rx="4" class="ln solid" /><text x={208 + i * 62} y={246 + (i % 2) * 14} class="tx c sm">{t}</text></g>
+              ))}
+              <line x1="136" y1="210" x2="182" y2="210" class="ln solid" /><line x1="358" y1="210" x2="404" y2="210" class="ln solid" />
+              <text x="270" y="140" class="tx c strong">Ouros Foundry</text>
+            </g>
+          </g>
+          <!-- 5–6: kiln vs low temperature -->
+          <g class="b b5 b6">
+            <g class="kiln">
+              <path d="M70 330 L70 150 Q70 110 110 110 L210 110 Q250 110 250 150 L250 330 Z" class="ln heat" />
+              {[0,1,2].map((i) => <line x1="92" y1={170 + i * 50} x2="228" y2={170 + i * 50} class="ln heat" />)}
+              {[0,1,2,3,4,5].map((i) => <path d={`M${100 + i * 22} 330 q 6 -18 0 -30 q -6 -12 0 -24`} class="ln heat flame" />)}
+              <text x="160" y="360" class="tx c heatx">1,300°C kiln</text>
+            </g>
+            <g class="cool">
+              <rect x="300" y="190" width="170" height="140" rx="6" class="ln" />
+              {[0,1,2].map((i) => <line x1="316" y1={220 + i * 34} x2="454" y2={220 + i * 34} class="ln" />)}
+              {[0,1,2].map((i) => <rect x={330 + i * 40} y={204 + i * 34} width="30" height="10" class="ln" />)}
+              <text x="385" y="360" class="tx c">Under 250°C at Ouros</text>
+            </g>
+          </g>
+          <!-- 7: powder to part -->
+          <g class="b b7">
+            {Array.from({ length: 70 }, (_, i) => <circle cx={70 + ((i * 37) % 130)} cy={150 + ((i * 53) % 130)} r="1.6" class="fill" />)}
+            <line x1="220" y1="215" x2="300" y2="215" class="ln" /><path d="M294 209 L300 215 L294 221" class="ln" />
+            <path d="M330 240 L420 188 L500 234 L410 286 Z" class="ln" />
+            <path d="M330 240 L330 256 L410 302 L410 286 M410 302 L500 250 L500 234" class="ln" />
+            <text x="135" y="320" class="tx c">Mineral powder</text><text x="415" y="330" class="tx c">Engineered part</text>
+          </g>
+        </svg>
+      </div>
+      <div class="words">
+        {beats.map((b, i) => <p class={`beat ${i === 0 ? "on" : ""}`} data-i={i}>{b.text}</p>)}
+        <ol class="ticks" aria-hidden="true">{beats.map((_, i) => <li class={i === 0 ? "on" : ""}></li>)}</ol>
+      </div>
+    </div>
+    <div class="beat-notes" hidden>{beats.map((b) => <span>{b.note}</span>)}</div>
+  </section>
+
+  <section class="materials wrap" id="materials">
+    <h2 class="serif h1">{composites.title}</h2>
+    <p class="lede">{composites.process}: {composites.inputs.map(([a, b]) => `${a.toLowerCase()} (${b.toLowerCase()})`).join(" plus ")}, formed under 250°C with no kiln.</p>
+    <div class="fam">
+      {composites.families.map((f) => (
+        <article>
+          <h3 class="serif">{f.name}</h3>
+          {f.status && <p class="status">{f.status}</p>}
+          <ul>{f.traits.map((t) => <li>{t}</li>)}</ul>
+          <p class="uses">{f.uses.join(", ")}</p>
+        </article>
+      ))}
+    </div>
+    <div class="process-row">
+      <Shot k="powder" class="ps" />
+      <Shot k="press" class="ps" />
+      <Shot k="cnc" class="ps" />
+    </div>
+  </section>
+
+  <section class="foundry" id="foundry">
+    <div class="wrap">
+      <div class="f-head">
+        <h2 class="serif h1">{foundry.title}</h2>
+        <p class="lede">{foundry.body}</p>
+      </div>
+      <figure class="f-fig">
+        <video src="/media/mg-line-dark.mp4" poster="/media/mg-line-dark-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+        <figcaption class="shot-tag">Existing motion graphic: the FOUNDRY line in line art</figcaption>
+      </figure>
+      <ol class="f-steps">
+        {foundry.steps.map((s) => (
+          <li><Shot k={s.shot} class="fs" /><h3 class="serif">{s.name}</h3><p>{s.body}</p></li>
+        ))}
+      </ol>
+      <p class="data">{foundry.data}</p>
+    </div>
+  </section>
+
+  <section class="where wrap">
+    <h2 class="serif h1">{useCases.title}</h2>
+    <div class="rows">
+      {useCases.items.map((u) => (
+        <article><Shot k={u.shot} class="rs" /><h3 class="serif">{u.name}</h3><p>{u.body}</p></article>
+      ))}
+    </div>
+  </section>
+
+  <section class="how wrap" id="how">
+    <h2 class="serif h1">{how.title}</h2>
+    <p class="lede">{how.body}</p>
+    <ol>
+      {how.steps.map((s) => <li><h3 class="serif">{s.name}</h3><p class="phase">{s.phase}</p><p>{s.body}</p></li>)}
+    </ol>
+    <p class="who">We work with {how.who[0].charAt(0).toLowerCase() + how.who[0].slice(1)} and {how.who[1].charAt(0).toLowerCase() + how.who[1].slice(1)}.</p>
+  </section>
+
+  <section class="team wrap" id="team">
+    <h2 class="serif h1">{team.title}</h2>
+    <div class="people">
+      {team.founders.map((p) => <article><div class="ph" aria-hidden="true">{p.init}</div><h3 class="serif">{p.name}</h3><p class="role">{p.role}</p><p>{p.bio}</p></article>)}
+    </div>
+    <h3 class="adv-h">Advisors</h3>
+    <div class="adv">
+      {team.advisors.map((p) => <article><h3 class="serif">{p.name}</h3><p class="role">{p.role}</p><p>{p.bio}</p></article>)}
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">
+      <h2 class="serif">{close.title}</h2>
+      <a class="btn" href={close.email}>{close.cta}</a>
+      <div class="foot-row"><a href={close.linkedin}>LinkedIn</a><a href={close.email}>Contact</a><span>{close.place}</span><span>© 2026 Ouros Materials</span></div>
+    </div>
+    <img class="foot-word" src="/brand/ouros-wordmark-line-white.svg" alt="Ouros Materials" />
+  </footer>
+</div>
+
+<style is:global>
+  .v2 { --paper: #ECEBE6; --ink: #171717; --graphite: #202120; --mute: #66665f; --rule: #cfcdc5; --heat: #C2502A; background: var(--paper); color: var(--ink); font: 400 17px/1.55 Inter, "Helvetica Neue", Arial, sans-serif; position: relative; }
+  .v2::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: .16; mix-blend-mode: multiply; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .v2 .wrap { max-width: 1280px; margin: 0 auto; padding-left: clamp(20px, 4vw, 48px); padding-right: clamp(20px, 4vw, 48px); }
+  .v2 .serif { font-family: Newsreader, Georgia, serif; font-weight: 400; letter-spacing: -0.012em; }
+  .v2 .h1 { font-size: clamp(38px, 4.6vw, 68px); line-height: 1.02; margin: 0; max-width: 18ch; }
+  .v2 .lede { color: var(--mute); font-size: clamp(17px, 1.3vw, 19px); max-width: 56ch; margin: 22px 0 0; }
+  .v2 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* Card nav */
+  .v2 .card-nav { position: fixed; top: 14px; right: 14px; z-index: 60; background: #F6F5F1; border: 1px solid #d9d7cf; border-radius: 6px; padding: 12px 14px; min-width: 116px; box-shadow: 0 1px 0 rgba(0,0,0,.04); }
+  .v2 .card-nav .mark { display: block; width: 44px; margin: 0 auto 8px; }
+  .v2 .card-nav .menu { display: block; margin-left: auto; width: 22px; height: 14px; background: none; border: 0; padding: 0; cursor: pointer; position: relative; }
+  .v2 .card-nav .menu i { position: absolute; left: 0; right: 0; height: 1.5px; background: var(--ink); transition: transform .2s; }
+  .v2 .card-nav .menu i:first-of-type { top: 3px; } .v2 .card-nav .menu i:last-of-type { bottom: 3px; }
+  .v2 .card-nav nav { display: none; flex-direction: column; margin-top: 10px; font: 500 12px/1 GeistMono, monospace; text-transform: uppercase; }
+  .v2 .card-nav nav a { text-decoration: none; padding: 9px 0; border-top: 1px solid #dddbd3; }
+  .v2 .card-nav.open nav { display: flex; }
+  .v2 .card-nav.open .menu i:first-of-type { transform: translateY(3.5px) rotate(45deg); } .v2 .card-nav.open .menu i:last-of-type { transform: translateY(-3.5px) rotate(-45deg); }
+
+  /* Hero */
+  .v2 .hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+  .v2 .hero-shot { position: absolute; inset: 0; }
+  .v2 .hero-shot img { filter: saturate(.7) brightness(1.08); }
+  .v2 .hero::after { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(236,235,230,.82) 0%, rgba(236,235,230,.55) 38%, rgba(236,235,230,0) 62%); pointer-events: none; }
+  .v2 .hero h1 { position: relative; z-index: 2; margin: clamp(80px, 13vh, 140px) 0 0; font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: clamp(56px, 8.6vw, 136px); line-height: .92; letter-spacing: -0.03em; text-align: center; max-width: 9ch; color: #111; }
+  .v2 .hero-sub { position: relative; z-index: 2; margin: 26px 0 0; max-width: 46ch; text-align: center; font-size: 16px; color: #2c2c2a; background: rgba(236,235,230,.78); padding: 10px 14px; border-radius: 4px; }
+  .v2 .hero-word { position: absolute; z-index: 2; left: clamp(20px, 4vw, 48px); right: clamp(20px, 4vw, 48px); bottom: 28px; width: calc(100% - 2 * clamp(20px, 4vw, 48px)); height: auto; }
+  .v2 .hero .shot-tag { bottom: auto; top: 14px; }
+
+  /* Story */
+  .v2 .story { position: relative; height: calc(var(--n) * 85vh + 100vh); }
+  .v2 .stage { position: sticky; top: 0; height: 100vh; padding: 14px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; }
+  .v2 .art { position: relative; background: var(--graphite); border-radius: 8px 0 0 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .v2 .art-note { position: absolute; top: 22px; left: 24px; right: 24px; margin: 0; color: #c9c9c3; font-size: 13.5px; line-height: 1.45; max-width: 44ch; min-height: 3em; }
+  .v2 .lines { width: min(94%, 760px); height: auto; margin-top: 40px; }
+  .v2 .lines .ln { fill: none; stroke: #d4d4ce; stroke-width: 1.2; }
+  .v2 .lines .ln.dash { stroke-dasharray: 4 5; stroke: #8f8f88; }
+  .v2 .lines .ln.solid { stroke: #ffffff; stroke-width: 1.6; }
+  .v2 .lines .ln.heat { stroke: var(--heat); stroke-width: 1.6; }
+  .v2 .lines .fill { fill: #d4d4ce; }
+  .v2 .lines .dot { fill: #fff; }
+  .v2 .lines .tx { fill: #bdbdb6; font: 500 10.5px GeistMono, monospace; }
+  .v2 .lines .tx.c { text-anchor: middle; }
+  .v2 .lines .tx.sm { font-size: 8.5px; }
+  .v2 .lines .tx.strong { fill: #fff; font-size: 12px; }
+  .v2 .lines .tx.heatx { fill: var(--heat); }
+  .v2 .lines .b { opacity: 0; transition: opacity .6s ease; }
+  .v2 .lines g g { transition: opacity .6s ease; }
+  .v2 .words { position: relative; background: #F3F2EE; border-radius: 0 8px 8px 0; display: flex; align-items: flex-end; padding: clamp(28px, 4vw, 56px); }
+  .v2 .beat { position: absolute; left: clamp(28px, 4vw, 56px); right: clamp(28px, 4vw, 56px); bottom: clamp(56px, 8vh, 96px); margin: 0; font-family: Newsreader, Georgia, serif; font-size: clamp(30px, 3.1vw, 48px); line-height: 1.08; letter-spacing: -0.015em; max-width: 17ch; opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+  .v2 .beat.on { opacity: 1; transform: none; }
+  .v2 .ticks { position: absolute; top: 24px; left: clamp(28px, 4vw, 56px); display: flex; gap: 6px; list-style: none; padding: 0; margin: 0; }
+  .v2 .ticks li { width: 18px; height: 2px; background: #cfcdc5; transition: background .3s; }
+  .v2 .ticks li.on { background: var(--ink); }
+  /* which art groups show per beat */
+  .v2 .story[data-b="0"] .b0, .v2 .story[data-b="1"] .b1,
+  .v2 .story[data-b="2"] .b2, .v2 .story[data-b="3"] .b3, .v2 .story[data-b="4"] .b4,
+  .v2 .story[data-b="5"] .b5, .v2 .story[data-b="6"] .b6, .v2 .story[data-b="7"] .b7 { opacity: 1; }
+  .v2 .story .exit { opacity: 0; } .v2 .story[data-b="1"] .exit { opacity: 1; }
+  .v2 .story[data-b="1"] .era { opacity: .35; }
+  .v2 .story .stalled, .v2 .story .bridge { opacity: 0; }
+  .v2 .story[data-b="3"] .stalled { opacity: 1; }
+  .v2 .story[data-b="4"] .bridge { opacity: 1; } .v2 .story[data-b="4"] .gapbox { opacity: 0; }
+  .v2 .story .cool { opacity: 0; } .v2 .story[data-b="6"] .cool { opacity: 1; } .v2 .story[data-b="6"] .kiln { opacity: .3; }
+  @media (max-width: 860px) {
+    .v2 .stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: 54% 46%; padding: 10px; }
+    .v2 .art { border-radius: 8px 8px 0 0; }
+    .v2 .words { border-radius: 0 0 8px 8px; }
+    .v2 .beat { bottom: 28px; font-size: clamp(26px, 7vw, 34px); }
+    .v2 .art-note { font-size: 12.5px; }
+  }
+
+  /* Materials */
+  .v2 .materials { padding-top: clamp(96px, 12vw, 160px); }
+  .v2 .fam { margin-top: 56px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+  .v2 .fam article { border-top: 1px solid var(--ink); padding-top: 18px; }
+  .v2 .fam h3 { font-size: clamp(26px, 2.4vw, 34px); margin: 0; }
+  .v2 .fam .status { margin: 4px 0 0; color: var(--mute); font-size: 15px; }
+  .v2 .fam ul { list-style: none; padding: 0; margin: 18px 0 0; }
+  .v2 .fam li { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .v2 .fam .uses { color: var(--mute); font-size: 15px; margin: 12px 0 0; }
+  .v2 .process-row { margin-top: 64px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .v2 .ps { aspect-ratio: 4 / 5; border-radius: 4px; }
+  @media (max-width: 860px) { .v2 .fam { grid-template-columns: minmax(0, 1fr); } .v2 .process-row { grid-template-columns: minmax(0, 1fr); } .v2 .ps { aspect-ratio: 4 / 3; } }
+
+  /* Foundry */
+  .v2 .foundry { margin-top: clamp(96px, 12vw, 160px); background: var(--graphite); color: #EDEDE8; padding: clamp(96px, 12vw, 160px) 0; }
+  .v2 .foundry .lede { color: #a8a8a1; }
+  .v2 .f-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+  .v2 .f-head .lede { margin: 0; }
+  .v2 .f-fig { position: relative; margin: 56px 0 0; border-radius: 8px; overflow: hidden; background: #111; }
+  .v2 .f-fig video { width: 100%; height: auto; display: block; }
+  .v2 .f-steps { list-style: none; padding: 0; margin: 56px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .v2 .fs { aspect-ratio: 4 / 3; border-radius: 4px; }
+  .v2 .f-steps h3 { font-size: 26px; margin: 18px 0 6px; }
+  .v2 .f-steps p { margin: 0; color: #a8a8a1; font-size: 15.5px; }
+  .v2 .foundry .data { margin: 48px 0 0; border-top: 1px solid #3a3b39; padding-top: 18px; color: #a8a8a1; max-width: 64ch; }
+  @media (max-width: 860px) { .v2 .f-head, .v2 .f-steps { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Where */
+  .v2 .where { padding-top: clamp(96px, 12vw, 160px); }
+  .v2 .rows { margin-top: 48px; border-top: 1px solid var(--ink); }
+  .v2 .rows article { display: grid; grid-template-columns: 220px minmax(0, 260px) minmax(0, 1fr); gap: 32px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+  .v2 .rs { aspect-ratio: 16 / 10; border-radius: 4px; }
+  .v2 .rows h3 { margin: 0; font-size: clamp(26px, 2.4vw, 36px); }
+  .v2 .rows p { margin: 0; color: var(--mute); max-width: 48ch; }
+  @media (max-width: 760px) { .v2 .rows article { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
+
+  /* How */
+  .v2 .how { padding-top: clamp(96px, 12vw, 160px); }
+  .v2 .how ol { list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; counter-reset: s; }
+  .v2 .how li { counter-increment: s; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .v2 .how li::before { content: counter(s); font-family: Newsreader, Georgia, serif; font-size: 44px; line-height: 1; display: block; margin-bottom: 10px; color: #9a998f; }
+  .v2 .how h3 { margin: 0; font-size: 26px; }
+  .v2 .how .phase { margin: 2px 0 10px; color: var(--mute); font-size: 14.5px; }
+  .v2 .how li p:last-child { margin: 0; font-size: 15.5px; }
+  .v2 .how .who { margin: 40px 0 0; color: var(--mute); max-width: 60ch; }
+  @media (max-width: 860px) { .v2 .how ol { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Team */
+  .v2 .team { padding: clamp(96px, 12vw, 160px) clamp(20px, 4vw, 48px); }
+  .v2 .people { margin-top: 48px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+  .v2 .ph { aspect-ratio: 4 / 5; background: #dddbd3; border-radius: 4px; display: flex; align-items: flex-end; padding: 14px; font-family: Newsreader, Georgia, serif; font-size: 44px; color: #b9b7ad; }
+  .v2 .people h3, .v2 .adv h3 { margin: 14px 0 0; font-size: 24px; }
+  .v2 .role { margin: 2px 0 8px; color: var(--mute); font-size: 14.5px; }
+  .v2 .people article p:last-child, .v2 .adv article p:last-child { margin: 0; font-size: 15px; }
+  .v2 .adv-h { margin: 64px 0 0; font-size: 15px; font-weight: 600; border-top: 1px solid var(--rule); padding-top: 16px; }
+  .v2 .adv { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+  @media (max-width: 860px) { .v2 .people { grid-template-columns: minmax(0, 1fr); } .v2 .adv { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* Footer */
+  .v2 .foot { background: var(--graphite); color: #EDEDE8; padding: clamp(96px, 12vw, 160px) 0 28px; overflow: hidden; }
+  .v2 .foot h2 { margin: 0; font-size: clamp(38px, 4.6vw, 68px); line-height: 1.04; max-width: 18ch; }
+  .v2 .btn { display: inline-block; margin-top: 32px; border: 1px solid #EDEDE8; color: #EDEDE8; text-decoration: none; padding: 13px 18px; border-radius: 3px; font-size: 15px; }
+  .v2 .foot-row { margin-top: 88px; display: flex; gap: 28px; flex-wrap: wrap; font-size: 14.5px; color: #9a9a93; border-top: 1px solid #3a3b39; padding-top: 18px; }
+  .v2 .foot-row a { color: #EDEDE8; text-decoration: none; }
+  .v2 .foot-word { display: block; width: calc(100% - 2 * clamp(20px, 4vw, 48px)); margin: 72px auto 64px; height: auto; }
+</style>
+<script>
+  const story = document.querySelector<HTMLElement>(".v2 .story")!;
+  const beats = [...story.querySelectorAll<HTMLElement>(".beat")];
+  const ticks = [...story.querySelectorAll<HTMLElement>(".ticks li")];
+  const notes = [...story.querySelectorAll<HTMLElement>(".beat-notes span")].map((s) => s.textContent || "");
+  const note = story.querySelector<HTMLElement>(".art-note")!;
+  let cur = -1;
+  const set = (b: number) => {
+    if (b === cur) return; cur = b;
+    story.dataset.b = String(b);
+    beats.forEach((el, i) => el.classList.toggle("on", i === b));
+    ticks.forEach((el, i) => el.classList.toggle("on", i <= b));
+    note.textContent = notes[b];
+  };
+  const onScroll = () => {
+    const r = story.getBoundingClientRect();
+    const span = story.offsetHeight - window.innerHeight;
+    const p = Math.min(1, Math.max(0, -r.top / span));
+    set(Math.min(beats.length - 1, Math.floor(p * beats.length)));
+  };
+  addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll); onScroll();
+
+  const nav = document.getElementById("cardnav")!;
+  const btn = nav.querySelector("button")!;
+  btn.addEventListener("click", () => { const o = !nav.classList.contains("open"); nav.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); });
+  nav.querySelectorAll("nav a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }));
+</script>
+</Version>
