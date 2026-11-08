@@ -5,6 +5,7 @@ const title = "Ouros Materials · Advanced ceramics, reinvented";
 const description =
   "Ouros Materials develops, qualifies and scales advanced ceramic composites for U.S. energy, defense and infrastructure, made below 250°C.";
 const url = "https://ourosmaterials.com";
+const { noindex = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -14,6 +15,7 @@ const url = "https://ourosmaterials.com";
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={url} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
