@@ -15,7 +15,7 @@ body { margin: 0; background: #0B0C0D; }
 .fit-inner { transform-origin: top left; }
 
 /* Composer pills */
-.pill { border: 1px solid #161718; background: transparent; color: #161718; padding: 4px 12px; border-radius: 999px; font-family: Haas, sans-serif; font-size: 14px; min-height: 32px; cursor: pointer; }
+.pill { border: 1px solid #161718; background: transparent; color: #161718; padding: 4px 12px; border-radius: 999px; font-family: Inter, sans-serif; font-size: 14px; min-height: 32px; cursor: pointer; }
 .pill.on { background: #161718; color: #F3F3F1; }
 [hidden] { display: none !important; }
 

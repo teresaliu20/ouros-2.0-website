@@ -1,5 +1,4 @@
-@font-face{font-family:'Haas';src:url('/fonts/haas-regular.otf') format('opentype');font-weight:400;font-display:swap}
-@font-face{font-family:'Haas';src:url('/fonts/haas-bold.otf') format('opentype');font-weight:700;font-display:swap}
+@font-face{font-family:'Inter';src:url('/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
 @font-face{font-family:'GeistMono';src:url('/fonts/geist-mono.woff2') format('woff2');font-weight:100 900;font-display:swap}
 body{margin:0}
 @property --temp{syntax:'<integer>';initial-value:1300;inherits:false}
@@ -33,7 +32,7 @@ body{margin:0}
 @keyframes bit{0.0%{transform:translate(0.0px,0.0px)}9.1%{transform:translate(-2.3px,15.0px)}18.2%{transform:translate(6.1px,23.9px)}27.3%{transform:translate(27.8px,25.0px)}36.4%{transform:translate(55.4px,22.7px)}45.5%{transform:translate(76.9px,24.0px)}54.5%{transform:translate(85.1px,33.0px)}63.6%{transform:translate(82.6px,48.1px)}72.7%{transform:translate(80.4px,63.0px)}81.8%{transform:translate(89.1px,71.7px)}90.9%{transform:translate(111.0px,72.7px)}100.0%{transform:translate(111.0px,72.7px)}}
 .bit{animation:bit 2.2s linear .6s both}
 @keyframes prog{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-.cm button{font-family:Haas,sans-serif;font-size:14px;cursor:pointer;min-height:32px}
+.cm button{font-family:Inter,sans-serif;font-size:14px;cursor:pointer;min-height:32px}
 
 @keyframes kdo14{from{stroke-dashoffset:var(--L)}to{stroke-dashoffset:0}}
 @keyframes ci00{0.00%{transform:translate(348.5px,326.5px)}19.91%{transform:translate(426.5px,326.5px)}43.64%{transform:translate(426.5px,419.5px)}100.00%{transform:translate(647.3px,419.5px)}}
