@@ -8,7 +8,7 @@
   onProgress?: (u: number) => void;
 };
 export function startPowder(o: PowderOpts = {}) {
-      const BG = o.bg ?? "#0B0C0D", G = o.grain ?? [214, 218, 220], AL = o.alpha ?? 1;
+      let BG = o.bg ?? "#0B0C0D", G = o.grain ?? [214, 218, 220], AL = o.alpha ?? 1;
       const D = o.desk ?? { x: 0.7, y: 0.5, s: 0.3 }, M = o.mob ?? { x: 0.5, y: 0.34, s: 0.22 };
       const cv = document.getElementById(o.canvas ?? "field") as HTMLCanvasElement;
       const ctx = cv.getContext("2d")!;
@@ -208,4 +208,10 @@ export function startPowder(o: PowderOpts = {}) {
         for (let i = 0; i < 400; i++) frame(performance.now() + i * 16);
       } else requestAnimationFrame(frame);
       document.addEventListener("visibilitychange", () => { if (!document.hidden) last = performance.now(); });
+      return {
+        setColors(bg: string, grain: [number, number, number], alpha?: number) {
+          BG = bg; G = grain; if (alpha !== undefined) AL = alpha;
+          if (reduce) for (let i = 0; i < 2; i++) frame(performance.now());
+        },
+      };
 }

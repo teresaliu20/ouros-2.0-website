@@ -1,320 +1,90 @@
 ---
-// Temporary landing page. The full site lives at /preview (noindex) until it launches.
-const title = "Ouros Materials · Advanced ceramics, reinvented";
-const description =
-  "Ouros Materials develops, qualifies and scales advanced ceramic composites for U.S. energy, defense and infrastructure, made below 250°C.";
-const url = "https://ourosmaterials.com";
+// Temporary landing page (variant B · Editorial). The full site lives at /preview until launch.
+// Day/night: paper by day, dark by night, based on whether the sun is up at the visitor's location.
+import Landing from "../layouts/Landing.astro";
 const email = "teresa@ourosmaterials.com";
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={url} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={url} />
-    <meta property="og:image" content={`${url}/og.jpg`} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#0B0C0D" />
-    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
-    <style is:global>
-      @font-face { font-family: "Inter"; src: url("/fonts/inter-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-      @font-face { font-family: "GeistMono"; src: url("/fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
-      :root { --bg: #0B0C0D; --fg: #EDEEEE; --mid: #9A9EA1; --dim: #5E6265; --line: rgba(237,238,238,.12); --acc: #D6F25C; }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); }
-      body { font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
-      a { color: inherit; text-decoration: none; }
-      .mono { font-family: GeistMono, ui-monospace, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+<Landing theme="#ECEBE6">
+  <script is:inline>
+    // Runs before paint so there is no flash. Sun elevation from the visitor's clock and an
+    // approximate longitude from their UTC offset; refined after load with IP location (/api/geo).
+    window.ourosSun = function (lat, lon, t) {
+      var r = Math.PI / 180, d = (t || Date.now()) / 864e5 - 10957.5;
+      var g = (357.529 + 0.98560028 * d) * r, q = 280.459 + 0.98564736 * d;
+      var L = (q + 1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g)) * r, e = (23.439 - 3.6e-7 * d) * r;
+      var ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+      var ha = ((18.697374558 + 24.06570982441908 * d) * 15 + lon) * r - ra;
+      return Math.asin(Math.sin(lat * r) * Math.sin(dec) + Math.cos(lat * r) * Math.cos(dec) * Math.cos(ha)) / r;
+    };
+    window.ourosTheme = function (lat, lon) {
+      var q = new URLSearchParams(location.search).get("theme");
+      if (q === "day" || q === "night") return q;
+      return window.ourosSun(lat, lon) > -4 ? "day" : "night";
+    };
+    document.documentElement.dataset.theme = window.ourosTheme(40, -new Date().getTimezoneOffset() / 4);
+  </script>
+  <canvas id="field" class="field" aria-hidden="true"></canvas>
+  <div class="b">
+    <header>
+      <a href="/" class="logo">
+        <img class="day" src="/brand/ouros-logo-primary-black.svg" alt="Ouros Materials" />
+        <img class="night" src="/brand/ouros-logo-primary-white.svg" alt="" aria-hidden="true" />
+      </a>
+      <a href={`mailto:${email}`} class="contact">Contact</a>
+    </header>
+    <main>
+      <h1>Rebuilding America’s <em>materials frontier.</em></h1>
+      <p>Advanced ceramics, reinvented. A new class of ceramic composites made below 250°C, for American energy, defense and infrastructure.</p>
+    </main>
+    <footer class="mono"><span>Ouros Materials</span><span>New Brunswick, New Jersey</span></footer>
+  </div>
+  <style is:global>
+    :root { --bg: #ECEBE6; --fg: #161718; --mid: #55595B; --dim: #6A6E70; }
+    :root[data-theme="night"] { --bg: #0E0F10; --fg: #E9E8E3; --mid: #A3A6A8; --dim: #7D8184; }
+    body { background: var(--bg); color: var(--fg); font-family: Inter, Helvetica, Arial, sans-serif; transition: background-color 1.2s ease, color 1.2s ease; }
+    .b { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); padding: clamp(22px, 3vw, 40px); }
+    .b header, .b footer { display: flex; justify-content: space-between; align-items: center; animation: fade 1.6s .3s both; }
+    .b .logo { line-height: 0; display: grid; } .b .logo img { height: 34px; grid-area: 1 / 1; transition: opacity 1.2s ease; }
+    .b .logo .night, :root[data-theme="night"] .b .logo .day { opacity: 0; }
+    :root[data-theme="night"] .b .logo .night { opacity: 1; }
+    .b .contact { font-size: 15px; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+    .b main { align-self: end; justify-self: center; text-align: center; max-width: 1000px; padding-bottom: 5vh; }
+    .b h1 { margin: 0; font-family: Newsreader, Georgia, serif; font-weight: 380; font-size: clamp(44px, 6.4vw, 104px); line-height: .98; letter-spacing: -.025em; animation: up 1.4s cubic-bezier(.2,.7,.2,1) both; }
+    .b h1 em { font-style: italic; font-weight: 340; }
+    .b p { margin: 26px auto 0; max-width: 520px; font-size: 16px; line-height: 1.55; color: var(--mid); transition: color 1.2s ease; animation: up 1.4s .2s cubic-bezier(.2,.7,.2,1) both; }
+    .b footer { font-size: 11px; letter-spacing: .06em; color: var(--dim); }
+    @media (max-width: 760px) {
+      .b .logo img { height: 28px; }
+      .b main { padding-bottom: 3vh; }
+      .b h1 { font-size: 46px; }
+      .b p { font-size: 15px; }
+    }
+  </style>
+  <script>
+    import { startPowder } from "../scripts/powder";
+    type Theme = "day" | "night";
+    const W = window as any, root = document.documentElement;
+    const PAL = {
+      day: { bg: "#ECEBE6", grain: [22, 23, 24] as [number, number, number], alpha: 0.9 },
+      night: { bg: "#0E0F10", grain: [222, 224, 225] as [number, number, number], alpha: 1 },
+    };
+    const start = PAL[root.dataset.theme as Theme] ?? PAL.day;
+    const powder = startPowder({ bg: start.bg, grain: start.grain, alpha: start.alpha, accent: false, marks: false,
+      desk: { x: 0.5, y: 0.33, s: 0.24 }, mob: { x: 0.5, y: 0.3, s: 0.17 } });
 
-      #field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-      .vignette { position: fixed; inset: 0; pointer-events: none;
-        background: radial-gradient(ellipse 70% 60% at 68% 50%, rgba(11,12,13,0) 40%, rgba(11,12,13,.75) 100%),
-                    linear-gradient(90deg, rgba(11,12,13,.85), rgba(11,12,13,0) 55%); }
-
-      .frame { position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); padding: 28px clamp(20px, 4vw, 56px); }
-      header, footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-      .brand { display: block; line-height: 0; }
-      .brand img { height: 35px; width: auto; display: block; animation: wipe 1.6s cubic-bezier(.6,0,.2,1) both; }
-      @keyframes wipe { from { clip-path: inset(0 100% 0 0); opacity: .2; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
-      .contact { border: 1px solid var(--line); padding: 10px 14px; border-radius: 3px; transition: border-color .3s, background .3s; animation: fade 1.6s .5s both; }
-      .contact .short { display: none; }
-      .contact:hover { border-color: var(--fg); background: rgba(237,238,238,.06); }
-
-      .copy { align-self: center; max-width: 640px; display: flex; flex-direction: column; gap: 22px; }
-      .eyebrow { color: #C9CCCE; display: flex; align-items: center; gap: 10px; }
-      .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 12px var(--acc); animation: pulse 2.4s ease-in-out infinite; }
-      @keyframes pulse { 50% { opacity: .35; } }
-      h1 { margin: 0; font-weight: 400; font-size: clamp(48px, 7vw, 108px); line-height: .94; letter-spacing: -.045em; }
-      h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
-      h1 .line > span { display: inline-block; animation: rise 1.3s cubic-bezier(.2,.7,.2,1) both; }
-      h1 .line:nth-child(2) > span { animation-delay: .12s; }
-      .sub { margin: 0; font-size: clamp(20px, 2.2vw, 30px); letter-spacing: -.02em; color: var(--mid); animation: rise 1.3s .32s cubic-bezier(.2,.7,.2,1) both; }
-      .lede { margin: 0; font-size: 16px; line-height: 1.55; color: #C9CCCE; max-width: 470px; animation: rise 1.3s .46s cubic-bezier(.2,.7,.2,1) both; }
-      .eyebrow { animation: fade 1.4s .1s both; }
-      @keyframes rise { from { transform: translateY(105%); opacity: 0; } }
-      @keyframes fade { from { opacity: 0; } }
-
-      footer { color: var(--dim); animation: fade 1.6s .8s both; }
-      .hud { display: flex; gap: 22px; align-items: center; }
-      .hud b { font-weight: 400; color: var(--mid); }
-      .bar { width: 72px; height: 1px; background: var(--line); position: relative; overflow: hidden; }
-      .bar i { position: absolute; inset: 0; background: var(--mid); transform-origin: left; transform: scaleX(0); }
-
-      @media (max-width: 760px) {
-        .brand img { height: 30px; }
-        .vignette { background: linear-gradient(180deg, rgba(11,12,13,.2), rgba(11,12,13,.1) 35%, rgba(11,12,13,.9) 70%); }
-        .copy { align-self: end; gap: 16px; padding-bottom: 18px; }
-        .lede { font-size: 15px; }
-        .contact .long { display: none; }
-        .contact .short { display: inline; }
-        footer .long { display: none; }
-        .lede { max-width: none; }
-        footer { flex-direction: column; align-items: flex-start; gap: 8px; }
-        .hud { gap: 14px; }
-      }
-      @media (max-height: 560px) and (min-width: 761px) { h1 { font-size: 56px; } }
-      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
-    </style>
-  </head>
-  <body>
-    <canvas id="field" aria-hidden="true"></canvas>
-    <div class="vignette"></div>
-    <div class="frame">
-      <header>
-        <a class="brand" href="/" aria-label="Ouros Materials"><img src="/brand/ouros-logo-primary-white.svg" alt="Ouros Materials" width="152" height="35" /></a>
-        <a class="contact mono" href={`mailto:${email}`}><span class="long">Get in touch · {email}</span><span class="short">Contact</span></a>
-      </header>
-
-      <main class="copy">
-        <div class="eyebrow mono"><span class="dot"></span>Advanced ceramics · Made in America</div>
-        <h1><span class="line"><span>Advanced ceramics,</span></span><span class="line"><span>reinvented.</span></span></h1>
-        <p class="sub">Rebuilding America’s materials frontier.</p>
-        <p class="lede">A new class of ceramic composites made below 250°C. Tough, machinable and fire-resistant, engineered for American energy, defense and infrastructure.</p>
-      </main>
-
-      <footer class="mono">
-        <span><span class="long">Ouros Materials · </span>New Brunswick, NJ · © 2026</span>
-        <div class="hud" aria-hidden="true">
-          <span>Form <b id="hud-n">01/04</b></span>
-          <span><b id="hud-form">Tile</b></span>
-          <span class="bar"><i id="hud-bar"></i></span>
-          <span id="hud-phase">Dispersed</span>
-        </div>
-      </footer>
-    </div>
-
-    <script>
-      // Powder → form. Grains drift as loose powder, then consolidate into rotating
-      // line-art ceramic forms, hold, and release back to powder. Pure canvas, no video.
-      const cv = document.getElementById("field") as HTMLCanvasElement;
-      const ctx = cv.getContext("2d")!;
-      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const $ = (id: string) => document.getElementById(id)!;
-      const hudN = $("hud-n"), hudForm = $("hud-form"), hudPhase = $("hud-phase"), hudBar = $("hud-bar");
-
-      type V3 = [number, number, number];
-      type Seg = [V3, V3];
-
-      // ---- Shape library (unit space, roughly -1..1) ------------------------
-      function box(cx: number, cy: number, cz: number, w: number, h: number, d: number): Seg[] {
-        const x0 = cx - w / 2, x1 = cx + w / 2, y0 = cy - h / 2, y1 = cy + h / 2, z0 = cz - d / 2, z1 = cz + d / 2;
-        const p: V3[] = [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
-        const e = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
-        return e.map(([a, b]) => [p[a], p[b]] as Seg);
-      }
-      function ring(r: number, y: number, n = 48): Seg[] {
-        const s: Seg[] = [];
-        for (let i = 0; i < n; i++) {
-          const a = (i / n) * Math.PI * 2, b = ((i + 1) / n) * Math.PI * 2;
-          s.push([[Math.cos(a) * r, y, Math.sin(a) * r], [Math.cos(b) * r, y, Math.sin(b) * r]]);
-        }
-        return s;
-      }
-      const tile = (): Seg[] => {
-        const s = box(0, 0, 0, 1.7, 0.16, 1.7);
-        for (let i = 1; i < 6; i++) { const t = -0.85 + (i / 6) * 1.7; s.push([[t, 0.08, -0.85], [t, 0.08, 0.85]], [[-0.85, 0.08, t], [0.85, 0.08, t]]); }
-        return s;
-      };
-      const tube = (): Seg[] => {
-        let s: Seg[] = [];
-        for (let k = 0; k <= 6; k++) s = s.concat(ring(0.62, -0.72 + (k / 6) * 1.44, 56));
-        s = s.concat(ring(0.42, -0.72, 40), ring(0.42, 0.72, 40));
-        for (let i = 0; i < 16; i++) { const a = (i / 16) * Math.PI * 2; s.push([[Math.cos(a) * 0.62, -0.72, Math.sin(a) * 0.62], [Math.cos(a) * 0.62, 0.72, Math.sin(a) * 0.62]]); }
-        return s;
-      };
-      const honeycomb = (): Seg[] => {
-        const s = box(0, 0, 0, 1.9, 0.22, 1.5);
-        const r = 0.17, w = Math.sqrt(3) * r, y = 0.11;
-        for (let row = -4; row <= 4; row++) for (let col = -5; col <= 5; col++) {
-          const cx = col * w + (row & 1 ? w / 2 : 0), cz = row * 1.5 * r;
-          if (Math.abs(cx) > 0.8 || Math.abs(cz) > 0.6) continue;
-          for (let i = 0; i < 6; i++) {
-            const a = Math.PI / 6 + (i * Math.PI) / 3, b = a + Math.PI / 3;
-            s.push([[cx + Math.cos(a) * r * 0.92, y, cz + Math.sin(a) * r * 0.92], [cx + Math.cos(b) * r * 0.92, y, cz + Math.sin(b) * r * 0.92]]);
-          }
-        }
-        return s;
-      };
-      const beam = (): Seg[] => {
-        // I-profile extruded along z.
-        const prof: [number, number][] = [[-.55,-.6],[.55,-.6],[.55,-.44],[.1,-.44],[.1,.44],[.55,.44],[.55,.6],[-.55,.6],[-.55,.44],[-.1,.44],[-.1,-.44],[-.55,-.44]];
-        const s: Seg[] = [];
-        const zs = [-1, -0.5, 0, 0.5, 1];
-        for (const z of zs) for (let i = 0; i < prof.length; i++) { const a = prof[i], b = prof[(i + 1) % prof.length]; s.push([[a[0], a[1], z], [b[0], b[1], z]]); }
-        for (const p of prof) s.push([[p[0], p[1], -1], [p[0], p[1], 1]]);
-        return s;
-      };
-      const SHAPES = [
-        { name: "Tile", segs: tile() },
-        { name: "Tube", segs: tube() },
-        { name: "Honeycomb panel", segs: honeycomb() },
-        { name: "Structural beam", segs: beam() },
-      ];
-
-      // Sample N points along segments, weighted by length.
-      function sample(segs: Seg[], n: number): V3[] {
-        const len = segs.map(([a, b]) => Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]));
-        const total = len.reduce((x, y) => x + y, 0);
-        const out: V3[] = [];
-        segs.forEach(([a, b], i) => {
-          const k = Math.max(1, Math.round((len[i] / total) * n));
-          for (let j = 0; j < k; j++) {
-            const t = Math.random(), jit = 0.006;
-            out.push([a[0] + (b[0] - a[0]) * t + (Math.random() - .5) * jit, a[1] + (b[1] - a[1]) * t + (Math.random() - .5) * jit, a[2] + (b[2] - a[2]) * t + (Math.random() - .5) * jit]);
-          }
-        });
-        while (out.length < n) out.push(out[(Math.random() * out.length) | 0]);
-        out.length = n;
-        // Shuffle so particles travel to random places on the form.
-        for (let i = out.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [out[i], out[j]] = [out[j], out[i]]; }
-        return out;
-      }
-
-      // ---- Particles ---------------------------------------------------------
-      let W = 0, H = 0, DPR = 1, N = 0, cx = 0, cy = 0, S = 0;
-      let hx: Float32Array, hy: Float32Array, px: Float32Array, py: Float32Array, vx: Float32Array, vy: Float32Array, delay: Float32Array, acc: Uint8Array;
-      let targets: V3[][] = [];
-
-      function resize() {
-        DPR = Math.min(devicePixelRatio || 1, 2);
-        W = innerWidth; H = innerHeight;
-        cv.width = W * DPR; cv.height = H * DPR;
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-        const mobile = W < 761;
-        cx = mobile ? W * 0.5 : W * 0.7;
-        cy = mobile ? H * 0.34 : H * 0.5;
-        S = mobile ? Math.min(W * 0.36, H * 0.22) : Math.min(W * 0.2, H * 0.3);
-        const n = mobile ? 1500 : 2800;
-        if (n !== N) init(n);
-      }
-      function init(n: number) {
-        N = n;
-        hx = new Float32Array(n); hy = new Float32Array(n); px = new Float32Array(n); py = new Float32Array(n); vx = new Float32Array(n); vy = new Float32Array(n);
-        delay = new Float32Array(n); acc = new Uint8Array(n);
-        for (let i = 0; i < n; i++) {
-          const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random());
-          hx[i] = Math.cos(a) * r * 2.3; hy[i] = Math.sin(a) * r * 1.5;
-          px[i] = cx + hx[i] * S; py[i] = cy + hy[i] * S;
-          delay[i] = Math.random(); acc[i] = Math.random() < 0.018 ? 1 : 0;
-        }
-        targets = SHAPES.map((s) => sample(s.segs, n));
-      }
-
-      // ---- Timeline ----------------------------------------------------------
-      const T_DISP = 1.2, T_FORM = 3.2, T_HOLD = 3.4, T_REL = 1.6;
-      const CYCLE = T_DISP + T_FORM + T_HOLD + T_REL;
-      const TILT = -0.52;
-      const ease = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t * t * (3 - 2 * t));
-
-      let start = performance.now(), last = start, lastPhase = "";
-      function frame(now: number) {
-        const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now;
-        const t = Math.max(0, (now - start) / 1000);
-        const k = Math.floor(t / CYCLE), u = t - k * CYCLE;
-        const si = reduce ? 0 : k % SHAPES.length;
-        const tg = targets[si];
-
-        let phase: string, pull: number;
-        if (reduce) { phase = "Formed"; pull = 1; }
-        else if (u < T_DISP) { phase = "Dispersed"; pull = 0; }
-        else if (u < T_DISP + T_FORM) { phase = "Consolidating"; pull = (u - T_DISP) / T_FORM; }
-        else if (u < T_DISP + T_FORM + T_HOLD) { phase = "Formed"; pull = 1; }
-        else { phase = "Releasing"; pull = -1; }
-
-        if (phase !== lastPhase) {
-          hudPhase.textContent = phase;
-          hudN.textContent = `0${si + 1}/0${SHAPES.length}`;
-          hudForm.textContent = SHAPES[si].name;
-          if (phase === "Releasing") {
-            for (let i = 0; i < N; i++) { const a = Math.random() * Math.PI * 2, m = 40 + Math.random() * 140; vx[i] += Math.cos(a) * m * 0.02; vy[i] += Math.sin(a) * m * 0.02; }
-          }
-          lastPhase = phase;
-        }
-        hudBar.style.transform = `scaleX(${reduce ? 1 : (u / CYCLE).toFixed(3)})`;
-
-        // Rotation of the form.
-        const ry = t * 0.22 + si * 0.9, cyR = Math.cos(ry), syR = Math.sin(ry), cxR = Math.cos(TILT), sxR = Math.sin(TILT);
-
-        ctx.fillStyle = "#0B0C0D";
-        ctx.fillRect(0, 0, W, H);
-
-        // Faint registration marks around the forming zone.
-        ctx.strokeStyle = "rgba(237,238,238,.08)"; ctx.lineWidth = 1;
-        const m = S * 1.45, L = 12;
-        ctx.beginPath();
-        for (const [sx, sy] of [[-1,-1],[1,-1],[1,1],[-1,1]]) {
-          const x = cx + sx * m, y = cy + sy * m;
-          ctx.moveTo(x, y); ctx.lineTo(x - sx * L, y); ctx.moveTo(x, y); ctx.lineTo(x, y - sy * L);
-        }
-        ctx.moveTo(cx - 6, cy); ctx.lineTo(cx + 6, cy); ctx.moveTo(cx, cy - 6); ctx.lineTo(cx, cy + 6);
-        ctx.stroke();
-
-        for (let i = 0; i < N; i++) {
-          let x = px[i], y = py[i];
-          // Loose-powder drift (cheap flow field).
-          const fx = Math.sin(y * 0.006 + t * 0.4 + delay[i] * 6) + Math.cos(t * 0.3 + i), fy = Math.cos(x * 0.006 - t * 0.35) * 0.8;
-
-          if (pull > 0) {
-            // Per-grain stagger so the form builds from the bottom up.
-            const p3 = tg[i];
-            let X = p3[0] * cyR - p3[2] * syR, Z = p3[0] * syR + p3[2] * cyR, Y = p3[1];
-            const Y2 = Y * cxR - Z * sxR, Z2 = Y * sxR + Z * cxR;
-            const persp = 3.2 / (3.2 + Z2);
-            const tx = cx + X * S * persp, ty = cy - Y2 * S * persp;
-            const order = (1 - (p3[1] + 1) / 2) * 0.55 + delay[i] * 0.45;
-            const w = phase === "Formed" ? 1 : ease((pull - order * 0.6) / 0.4);
-            vx[i] += (tx - x) * 0.07 * w + fx * 0.04 * (1 - w);
-            vy[i] += (ty - y) * 0.07 * w + fy * 0.04 * (1 - w);
-            vx[i] *= 0.72 + 0.2 * (1 - w); vy[i] *= 0.72 + 0.2 * (1 - w);
-          } else {
-            // Loose powder: each grain drifts around its own spot in a wide cloud.
-            const hxp = cx + (hx[i] + Math.sin(t * 0.25 + delay[i] * 9) * 0.12) * S, hyp = cy + (hy[i] + Math.cos(t * 0.2 + delay[i] * 7) * 0.1) * S;
-            vx[i] += fx * 0.03 + (hxp - x) * 0.004; vy[i] += fy * 0.03 + (hyp - y) * 0.004;
-            vx[i] *= 0.93; vy[i] *= 0.93;
-          }
-          x += vx[i] * dt * 60; y += vy[i] * dt * 60;
-          px[i] = x; py[i] = y;
-
-          if (acc[i]) { ctx.fillStyle = "rgba(214,242,92,.9)"; ctx.fillRect(x, y, 1.6, 1.6); }
-          else { ctx.fillStyle = `rgba(214,218,220,${0.38 + delay[i] * 0.45})`; ctx.fillRect(x, y, 1.35, 1.35); }
-        }
-        if (!reduce) requestAnimationFrame(frame);
-      }
-
-      addEventListener("resize", () => { resize(); if (reduce) requestAnimationFrame(frame); });
-      resize();
-      if (reduce) {
-        // Static: snap grains onto the first form.
-        for (let i = 0; i < 400; i++) frame(performance.now() + i * 16);
-      } else requestAnimationFrame(frame);
-      document.addEventListener("visibilitychange", () => { if (!document.hidden) last = performance.now(); });
-    </script>
-  </body>
-</html>
+    let lat = 40, lon = -new Date().getTimezoneOffset() / 4;
+    const apply = () => {
+      const t: Theme = W.ourosTheme(lat, lon);
+      if (root.dataset.theme !== t) root.dataset.theme = t;
+      const p = PAL[t];
+      powder.setColors(p.bg, p.grain, p.alpha);
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", p.bg);
+    };
+    apply();
+    // Refine with the visitor's approximate location (city-level, from Vercel's IP headers; nothing stored).
+    fetch("/api/geo").then((r) => (r.ok ? r.json() : null)).then((g) => {
+      if (g && Number.isFinite(g.lat) && Number.isFinite(g.lon)) { lat = g.lat; lon = g.lon; apply(); }
+    }).catch(() => {});
+    setInterval(apply, 5 * 60 * 1000);
+  </script>
+</Landing>
