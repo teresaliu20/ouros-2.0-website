@@ -1,0 +1,36 @@
+---
+// Variant A · Quiet. Inter Display, two-tone headline, four quiet corners.
+import Landing from "../../layouts/Landing.astro";
+const email = "teresa@ourosmaterials.com";
+---
+<Landing noindex>
+  <canvas id="field" class="field" aria-hidden="true"></canvas>
+  <div class="a">
+    <a class="tl" href="/"><img src="/brand/ouros-logo-primary-white.svg" alt="Ouros Materials" /></a>
+    <a class="tr" href={`mailto:${email}`}>{email}</a>
+    <h1 class="bl"><span>Advanced ceramics, reinvented.</span> Rebuilding America’s materials frontier.</h1>
+    <div class="br mono"><span>New Brunswick, NJ</span><span>40.49° N, 74.45° W</span></div>
+  </div>
+  <style is:global>
+    body { background: #0B0C0D; color: #EDEEEE; font-family: Inter, Helvetica, Arial, sans-serif; }
+    .a { position: fixed; inset: 0; padding: clamp(22px, 3vw, 40px); }
+    .a > * { position: absolute; animation: fade 1.6s .2s both; }
+    .tl { top: clamp(22px, 3vw, 40px); left: clamp(22px, 3vw, 40px); line-height: 0; }
+    .tl img { height: 34px; }
+    .tr { top: clamp(22px, 3vw, 40px); right: clamp(22px, 3vw, 40px); font-size: 15px; letter-spacing: -.01em; color: #C4C7C9; border-bottom: 1px solid transparent; transition: border-color .3s, color .3s; }
+    .tr:hover { color: #fff; border-color: #fff; }
+    .bl { left: clamp(22px, 3vw, 40px); bottom: clamp(22px, 3vw, 40px); margin: 0; max-width: min(760px, 58vw); font-weight: 400; font-size: clamp(30px, 3.6vw, 54px); line-height: 1.02; letter-spacing: -.035em; color: #6F7376; animation: up 1.4s .1s cubic-bezier(.2,.7,.2,1) both; }
+    .bl span { color: #EDEEEE; }
+    .br { right: clamp(22px, 3vw, 40px); bottom: clamp(22px, 3vw, 40px); display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 11px; letter-spacing: .06em; color: #7D8184; }
+    @media (max-width: 760px) {
+      .tl img { height: 28px; }
+      .tr { font-size: 13px; top: 70px; left: 22px; right: auto; }
+      .bl { max-width: none; right: 22px; bottom: 74px; font-size: 36px; }
+      .br { left: 22px; right: auto; align-items: flex-start; flex-direction: row; gap: 14px; }
+    }
+  </style>
+  <script>
+    import { startPowder } from "../../scripts/powder";
+    startPowder({ desk: { x: 0.66, y: 0.42, s: 0.3 }, mob: { x: 0.5, y: 0.4, s: 0.2 }, accent: false, marks: false });
+  </script>
+</Landing>

@@ -1,0 +1,45 @@
+---
+// Shared head for landing-page variants.
+const { title = "Ouros Materials · Advanced ceramics, reinvented", theme = "#0B0C0D", noindex = false } = Astro.props;
+const description =
+  "Ouros Materials develops, qualifies and scales advanced ceramic composites for U.S. energy, defense and infrastructure, made below 250°C.";
+const url = "https://ourosmaterials.com";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:image" content={`${url}/og.jpg`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content={theme} />
+    <style is:global>
+      @font-face { font-family: "Inter"; src: url("/fonts/inter-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+      @font-face { font-family: "GeistMono"; src: url("/fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+      @font-face { font-family: "Geist"; src: url("/fonts/geist-var.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+      @font-face { font-family: "Newsreader"; src: url("/fonts/newsreader-var.woff2") format("woff2"); font-weight: 200 800; font-display: swap; }
+      @font-face { font-family: "Newsreader"; src: url("/fonts/newsreader-var-italic.woff2") format("woff2"); font-weight: 200 800; font-style: italic; font-display: swap; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body { overflow: hidden; -webkit-font-smoothing: antialiased; }
+      a { color: inherit; text-decoration: none; }
+      canvas.field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+      .mono { font-family: GeistMono, ui-monospace, monospace; text-transform: uppercase; }
+      @keyframes fade { from { opacity: 0; } }
+      @keyframes up { from { opacity: 0; transform: translateY(14px); } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
