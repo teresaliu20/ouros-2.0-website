@@ -7,11 +7,19 @@
 //   DECK_KEY         base64 AES key that decrypts the deck; also signs cookies (required)
 //   DECK_WEBHOOK_URL optional: POSTs {text,email,...} on each login (Slack incoming webhook, Zapier, etc.)
 //   ATTIO_API_KEY    optional: on each login, finds or creates the person in Attio and adds a note
+//   RESEND_API_KEY   optional: emails DECK_NOTIFY_EMAIL when someone signs in, and when they come back
+//                    (at most once per 6 hours per viewer). Skips viewers on DECK_NOTIFY_SKIP_DOMAIN.
+//   DECK_NOTIFY_EMAIL     default teresa@ourosmaterials.com
+//   DECK_NOTIFY_FROM      default "Ouros Deck <onboarding@resend.dev>" (works without DNS setup when the
+//                         Resend account is registered to DECK_NOTIFY_EMAIL)
+//   DECK_NOTIFY_SKIP_DOMAIN default ourosmaterials.com (your own team's views don't email you)
 import { IV, DATA } from "./_deck-data.js";
 
 export const config = { runtime: "edge" };
 
 const COOKIE = "ouros_deck";
+const SEEN = "ouros_deck_seen";
+const SEEN_AGE = 60 * 60 * 6;
 const MAX_AGE = 60 * 60 * 24 * 30;
 const CONTACT = "teresa@ourosmaterials.com";
 const enc = new TextEncoder();
@@ -32,7 +40,15 @@ export default async function handler(request, context) {
   if (!session) return gate(200);
 
   try {
-    return new Response(await deckHtml(), { headers: htmlHeaders() });
+    const headers = new Headers(htmlHeaders());
+    const seen = (request.headers.get("cookie") || "").split(/;\s*/).some((c) => c.startsWith(SEEN + "="));
+    if (!seen) {
+      const n = emailNotify(visitOf(session.e, request), "came back to");
+      if (context && context.waitUntil) context.waitUntil(n.catch(() => {}));
+      else await n.catch(() => {});
+      headers.append("Set-Cookie", `${SEEN}=1; Path=/; Max-Age=${SEEN_AGE}; HttpOnly; Secure; SameSite=Lax`);
+    }
+    return new Response(await deckHtml(), { headers });
   } catch (e) {
     console.error("deck decrypt failed", e);
     return new Response("The deck couldn't be opened. Please email " + CONTACT, { status: 500 });
@@ -54,22 +70,30 @@ async function login(request, context) {
     return gate(401, "That passcode isn't right.", email);
   }
 
-  const visit = {
-    email,
-    at: new Date().toISOString(),
-    city: decodeURIComponent(request.headers.get("x-vercel-ip-city") || ""),
-    country: request.headers.get("x-vercel-ip-country") || "",
-  };
+  const visit = visitOf(email, request);
   console.log(JSON.stringify({ deck: "login", ...visit }));
-  const notify = Promise.allSettled([webhook(visit), attio(visit)]);
+  const notify = Promise.allSettled([webhook(visit), attio(visit), emailNotify(visit, "signed in to")]);
   if (context && context.waitUntil) context.waitUntil(notify);
   else await notify;
 
   const token = await sign({ e: email, x: Date.now() + MAX_AGE * 1000 });
   return new Response(null, {
     status: 303,
-    headers: { Location: "/deck", "Set-Cookie": `${COOKIE}=${token}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax` },
+    headers: [
+      ["Location", "/deck"],
+      ["Set-Cookie", `${COOKIE}=${token}; Path=/; Max-Age=${MAX_AGE}; HttpOnly; Secure; SameSite=Lax`],
+      ["Set-Cookie", `${SEEN}=1; Path=/; Max-Age=${SEEN_AGE}; HttpOnly; Secure; SameSite=Lax`],
+    ],
   });
+}
+
+function visitOf(email, request) {
+  return {
+    email,
+    at: new Date().toISOString(),
+    city: decodeURIComponent(request.headers.get("x-vercel-ip-city") || ""),
+    country: request.headers.get("x-vercel-ip-country") || "",
+  };
 }
 
 // ---------- crypto helpers ----------
@@ -121,6 +145,30 @@ function safeEqual(a, b) {
 
 // ---------- notifications ----------
 const where = (v) => [v.city, v.country].filter(Boolean).join(", ");
+
+// Email via Resend (https://resend.com). Plain fetch, no SDK, so it runs on the edge.
+async function emailNotify(v, verb) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  const skip = (process.env.DECK_NOTIFY_SKIP_DOMAIN ?? "ourosmaterials.com").toLowerCase();
+  if (skip && v.email.endsWith("@" + skip)) return;
+  const to = process.env.DECK_NOTIFY_EMAIL || CONTACT;
+  const from = process.env.DECK_NOTIFY_FROM || "Ouros Deck <onboarding@resend.dev>";
+  const loc = where(v);
+  const when = new Date(v.at).toLocaleString("en-US", { timeZone: "America/Los_Angeles", dateStyle: "medium", timeStyle: "short" });
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      reply_to: v.email,
+      subject: `Deck view: ${v.email} ${verb} the investor deck`,
+      text: `${v.email} ${verb} the Ouros investor deck.\n\nWhen: ${when} PT\nWhere: ${loc || "unknown"}\n\nReply to this email to write to them directly.`,
+    }),
+  });
+  if (!r.ok) console.error("deck email failed", r.status, await r.text());
+}
 
 async function webhook(v) {
   if (!process.env.DECK_WEBHOOK_URL) return;
