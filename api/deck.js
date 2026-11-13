@@ -39,6 +39,14 @@ export default async function handler(request, context) {
   const session = await readSession(request);
   if (!session) return gate(200);
 
+  // Signed-in check of the email alert setup: /deck?action=test-email
+  if (action === "test-email") {
+    const text = (m) => new Response(m, { headers: { "content-type": "text/plain; charset=utf-8", "Cache-Control": "no-store" } });
+    if (!process.env.RESEND_API_KEY) return text("RESEND_API_KEY is not set for this deployment. Add it in Vercel (Production) and redeploy.");
+    const r = await sendEmail(visitOf(session.e, request), "tested email alerts on", true);
+    return text(r.ok ? `Test email sent to ${process.env.DECK_NOTIFY_EMAIL || CONTACT}. Check your inbox (and spam).` : `Resend refused the email (HTTP ${r.status}): ${r.body}`);
+  }
+
   try {
     const headers = new Headers(htmlHeaders());
     const seen = (request.headers.get("cookie") || "").split(/;\s*/).some((c) => c.startsWith(SEEN + "="));
@@ -148,10 +156,15 @@ const where = (v) => [v.city, v.country].filter(Boolean).join(", ");
 
 // Email via Resend (https://resend.com). Plain fetch, no SDK, so it runs on the edge.
 async function emailNotify(v, verb) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return;
+  if (!process.env.RESEND_API_KEY) return;
   const skip = (process.env.DECK_NOTIFY_SKIP_DOMAIN ?? "ourosmaterials.com").toLowerCase();
   if (skip && v.email.endsWith("@" + skip)) return;
+  const r = await sendEmail(v, verb);
+  if (!r.ok) console.error("deck email failed", r.status, r.body);
+}
+
+async function sendEmail(v, verb) {
+  const key = process.env.RESEND_API_KEY;
   const to = process.env.DECK_NOTIFY_EMAIL || CONTACT;
   const from = process.env.DECK_NOTIFY_FROM || "Ouros Deck <onboarding@resend.dev>";
   const loc = where(v);
@@ -167,7 +180,7 @@ async function emailNotify(v, verb) {
       text: `${v.email} ${verb} the Ouros investor deck.\n\nWhen: ${when} PT\nWhere: ${loc || "unknown"}\n\nReply to this email to write to them directly.`,
     }),
   });
-  if (!r.ok) console.error("deck email failed", r.status, await r.text());
+  return { ok: r.ok, status: r.status, body: r.ok ? "" : await r.text() };
 }
 
 async function webhook(v) {
