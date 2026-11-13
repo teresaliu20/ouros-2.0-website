@@ -8,6 +8,12 @@ export const icon: Record<string, string> = {
   fiberglass: `<path d="M10 30 L32 18 L54 30 L32 42 Z"/><path d="M16 27 L38 39 M22 24 L44 36 M28 21 L50 33 M16 33 L38 21 M22 36 L44 24 M28 39 L50 27"/><path d="M10 30 L10 34 L32 46 L54 34 L54 30"/>`,
   transistor: `<path d="M22 14 L42 14 L42 34 Q42 40 32 40 Q22 40 22 34 Z"/><path d="M22 20 L42 20"/><path d="M26 40 L26 56 M32 40 L32 56 M38 40 L38 56"/>`,
   fiber: `<path d="M32 32 m-4 0 a4 4 0 1 0 8 0 a8 8 0 1 0 -16 0 a12 12 0 1 0 24 0 a16 16 0 1 0 -32 0 a20 20 0 1 0 40 0"/><path d="M52 32 L60 32"/><circle cx="61" cy="32" r="1.6" class="fill"/>`,
+  // deep history
+  bronze: `<path d="M20 14 L44 14 L48 22 Q50 34 40 44 L36 54 L28 54 L24 44 Q14 34 16 22 Z"/><path d="M26 54 L26 60 L38 60 L38 54"/><path d="M22 22 L42 22"/><path d="M24 30 Q32 34 40 30"/>`,
+  iron: `<path d="M10 22 L50 22 Q58 22 58 28 L44 30 L40 38 L46 46 L18 46 L24 38 L20 30 L10 30 Z"/><path d="M14 54 L50 54 L46 46 M18 46 L14 54"/>`,
+  porcelain: `<path d="M26 8 L38 8 L36 14 Q46 18 46 30 Q46 46 38 52 L40 56 L24 56 L26 52 Q18 46 18 30 Q18 18 28 14 Z"/><path d="M22 26 Q32 30 42 26 M20 36 Q32 40 44 36"/><path d="M28 31 Q30 28 32 31 Q34 34 36 31"/>`,
+  cokeiron: `<path d="M22 56 L18 24 L26 10 L38 10 L46 24 L42 56 Z"/><path d="M20 34 L44 34 M19 44 L45 44"/><path d="M28 10 Q26 4 30 2 M36 10 Q38 5 34 2"/><path d="M42 50 L54 50 L56 56"/><path d="M8 56 L58 56"/>`,
+  cement: `<path d="M14 18 L32 10 L50 18 L32 26 Z"/><path d="M14 18 L14 46 L32 54 L50 46 L50 18"/><path d="M32 26 L32 54"/><path d="M14 32 L32 40 L50 32"/>`,
   // story
   flask: `<path d="M26 10 L38 10 M28 10 L28 26 L16 50 Q14 54 18 54 L46 54 Q50 54 48 50 L36 26 L36 10"/><path d="M20 42 L44 42"/><circle cx="28" cy="47" r="1.6"/><circle cx="36" cy="48" r="1.2"/>`,
   factory: `<path d="M8 54 L8 30 L20 22 L20 30 L32 22 L32 30 L44 22 L44 54 Z"/><path d="M44 54 L56 54 L56 12 L50 12 L50 54"/><path d="M14 40 L20 40 M26 40 L32 40 M14 46 L20 46 M26 46 L32 46 M36 40 L40 40"/><path d="M8 54 L58 54"/>`,
