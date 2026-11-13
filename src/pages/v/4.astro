@@ -191,11 +191,11 @@ const roadmap = [
       <div class="t-inner">
         <figure class="t-fig">
           <div class="t-frame">
-            <video class="tv hot" src="/v/media/crystals.mp4" poster="/v/media/crystals-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
-            <video class="tv cool" src="/v/media/pellets.mp4" poster="/v/media/pellets-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+            <video class="tv hot" src="/v/media/kiln.mp4" poster="/v/media/kiln-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+            <video class="tv cool" src="/v/media/ovendoor.mp4" poster="/v/media/ovendoor-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
             <i class="cm tl"></i><i class="cm tr"></i><i class="cm bl"></i><i class="cm br"></i>
           </div>
-          <figcaption><span class="cap-a">FIG. 01 · CHEMISTRY, NOT FIRE</span><span class="cap-b">NO KILN</span></figcaption>
+          <figcaption><span class="cap-a">FIG. 01 · KILN</span><span class="cap-b">1,000–1,400°C</span></figcaption>
         </figure>
         <div class="t-right">
           <p class="t-label">The breakthrough</p>
@@ -221,10 +221,6 @@ const roadmap = [
       <p class="lede">{powderToPart.body}</p>
     </div>
     <div class="flowwrap"><FlowDiagram /></div>
-    <div class="docs">
-      <figure><video src="/v/media/pelletshand.mp4" poster="/v/media/pelletshand-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video><figcaption>Mineral feedstock</figcaption></figure>
-      <figure><video src="/v/media/cnc.mp4" poster="/v/media/cnc-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video><figcaption>Machinable like wood: cut, drilled and CNC’d</figcaption></figure>
-    </div>
     <div class="fam">
       {composites.families.map((f) => (
         <article>
@@ -536,8 +532,8 @@ const roadmap = [
     tbar.style.width = `${e * 100}%`;
     cool.style.opacity = String(clamp((e - 0.55) / 0.35));
     const cooled = e > 0.75;
-    capA.textContent = cooled ? "FIG. 02 · SOLIDIFIED BELOW 250°C" : "FIG. 01 · CHEMISTRY, NOT FIRE";
-    capB.textContent = "NO KILN";
+    capA.textContent = cooled ? "FIG. 02 · INDUSTRIAL OVEN" : "FIG. 01 · KILN";
+    capB.textContent = cooled ? "BELOW 250°C" : "1,000–1,400°C";
     const s = p < 0.22 ? 0 : p < 0.72 ? 1 : 2;
     steps.forEach((el, i) => el.classList.toggle("on", i === s));
   };
