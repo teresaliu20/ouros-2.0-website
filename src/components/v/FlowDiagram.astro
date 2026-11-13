@@ -1,0 +1,125 @@
+---
+// AIRCO-style process diagram: shaded isometric equipment joined by thin flow lines with travelling dots.
+import { projection, solid, cylinder, poly, line, bounds, f } from "./iso";
+
+const P = projection(30, 30, 2.15);
+type Obj = { svg: string; b: { x: number; y: number; w: number; h: number } };
+const place = (o: Obj, cx: number, cy: number) =>
+  `<g transform="translate(${f(cx - (o.b.x + o.b.w / 2))} ${f(cy - (o.b.y + o.b.h / 2))})">${o.svg}</g>`;
+
+// Hopper: box body on four legs, inverted pyramid below
+const hopper = (): Obj => {
+  const legs = [[2, 2], [22, 2], [22, 22], [2, 22]].map(([x, y]) => line(P, [x, y, 0], [x, y, 16])).join("");
+  const cone = poly(P, [[4, 24, 16], [24, 24, 16], [14, 14, 8]]) + poly(P, [[24, 4, 16], [24, 24, 16], [14, 14, 8]]);
+  return {
+    svg: `<path class="ed thin" d="${legs}"/><g class="solid"><path class="ff" d="${cone}"/><path class="ed" d="${cone}"/></g>${solid(P, 0, 0, 16, 26, 26, 16)}${solid(P, 9, 9, 32, 8, 8, 4)}`,
+    b: bounds(P, [[0, 0, 0], [26, 0, 0], [0, 26, 0], [26, 26, 36], [0, 0, 36], [26, 0, 36]], 0),
+  };
+};
+// Pellet drum
+const drum = (): Obj => ({
+  svg: cylinder(P, 12, 12, 0, 11, 24) + solid(P, 10, 10, 24, 4, 4, 3),
+  b: bounds(P, [[1, 1, 0], [23, 23, 0], [23, 1, 27], [1, 23, 27], [1, 1, 27]], 0),
+});
+// Process module: dark unit with panel lines and top fittings (the AIRCO black box, our version)
+const moduleObj = (): Obj => {
+  const W = 80, D = 36, H = 34;
+  let panels = "";
+  for (let k = 1; k < 6; k++) panels += line(P, [3, D, (H * k) / 6], [W / 2 - 2, D, (H * k) / 6]) + line(P, [W / 2 + 2, D, (H * k) / 6], [W - 3, D, (H * k) / 6]);
+  panels += line(P, [W / 2, D, 2], [W / 2, D, H - 2]);
+  for (let k = 1; k < 4; k++) panels += line(P, [W, (D * k) / 4, 3], [W, (D * k) / 4, H - 3]);
+  const fit = [12, 26, 54, 68].map((x) => cylinder(P, x, D / 2, H, 3, 4, "dark")).join("");
+  return {
+    svg: `${solid(P, 0, 0, 0, W, D, H, "dark")}<path class="panel" d="${panels}"/>${fit}`,
+    b: bounds(P, [[0, 0, 0], [W, 0, 0], [0, D, 0], [W, D, 0], [0, 0, H + 4], [W, 0, H + 4], [0, D, H + 4]], 0),
+  };
+};
+// Parts
+const panelPart = (): Obj => ({ svg: solid(P, 0, 0, 0, 40, 26, 2.5), b: bounds(P, [[0, 0, 0], [40, 0, 0], [0, 26, 0], [40, 26, 2.5], [0, 0, 2.5]], 0) });
+const bracket = (): Obj => ({
+  svg: solid(P, 0, 0, 0, 28, 12, 3) + solid(P, 0, 0, 3, 3, 12, 22) + cylinder(P, 18, 6, 3, 2.4, 0.4),
+  b: bounds(P, [[0, 0, 0], [28, 0, 0], [0, 12, 0], [28, 12, 3], [0, 0, 25], [3, 12, 25]], 0),
+});
+const insulator = (): Obj => ({
+  svg: cylinder(P, 10, 10, 0, 4, 34) + [6, 14, 22, 30].map((z) => cylinder(P, 10, 10, z, 10, 2)).join("") + cylinder(P, 10, 10, 34, 3, 3),
+  b: bounds(P, [[0, 0, 0], [20, 20, 0], [20, 0, 37], [0, 20, 37], [0, 0, 37]], 0),
+});
+const machined = (): Obj => ({
+  svg: solid(P, 0, 0, 0, 34, 22, 10) + solid(P, 6, 4, 10, 12, 14, 4) + cylinder(P, 26, 8, 10, 3, 0.3) + cylinder(P, 26, 16, 10, 3, 0.3),
+  b: bounds(P, [[0, 0, 0], [34, 0, 0], [0, 22, 0], [34, 22, 14], [0, 0, 14]], 0),
+});
+
+const VB = { w: 1200, h: 440 };
+const IN = [{ x: 130, y: 120, o: hopper(), t: "Ceramic matrix", s: "Abundant mineral feedstock" }, { x: 130, y: 300, o: drum(), t: "Second phase", s: "Polymer, later metal alloy" }];
+const MOD = { x: 560, y: 205, o: moduleObj() };
+const OUT = [
+  { y: 52, o: panelPart(), t: "Panels" }, { y: 150, o: bracket(), t: "Brackets" },
+  { y: 258, o: insulator(), t: "Insulators" }, { y: 370, o: machined(), t: "Machined parts" },
+];
+const OX = 960;
+const hw = (o: Obj) => o.b.w / 2, hh = (o: Obj) => o.b.h / 2;
+const mL = MOD.x - hw(MOD.o) - 14, mR = MOD.x + hw(MOD.o) + 14;
+const conn = [
+  ...IN.map((n) => `M${n.x + hw(n.o) + 14} ${n.y} H300 V${MOD.y} H${mL}`),
+  ...OUT.map((o) => `M${mR} ${MOD.y} H820 V${o.y} H${OX - hw(o.o) - 16}`),
+];
+---
+<figure class="flowd" aria-label="Mineral feedstock and a second phase go into the Ouros low-temperature process and come out as panels, brackets, insulators and machined parts">
+  <svg viewBox={`0 0 ${VB.w} ${VB.h}`} role="img">
+    <g class="conns">
+      {conn.map((d) => <path d={d} class="conn" />)}
+      {conn.map((d, i) => [0, 1].map((k) => (
+        <circle r="3" class="flow-dot"><animateMotion dur="3.6s" repeatCount="indefinite" begin={`${(i * 0.45 + k * 1.8).toFixed(2)}s`} path={d} /></circle>
+      )))}
+      <circle cx="300" cy={MOD.y} r="3.2" class="node" /><circle cx="820" cy={MOD.y} r="3.2" class="node" />
+    </g>
+    {IN.map((n) => (
+      <g class="obj">
+        <g set:html={place(n.o, n.x, n.y)} />
+        <text x={n.x} y={n.y + hh(n.o) + 24} class="lab c">{n.t}</text>
+        <text x={n.x} y={n.y + hh(n.o) + 42} class="sub c">{n.s}</text>
+      </g>
+    ))}
+    <g class="obj">
+      <g set:html={place(MOD.o, MOD.x, MOD.y)} />
+      <text x={MOD.x} y={MOD.y + hh(MOD.o) + 30} class="lab c">Ouros low-temperature solidification</text>
+      <text x={MOD.x} y={MOD.y + hh(MOD.o) + 48} class="sub c">Below 250°C · no kiln</text>
+    </g>
+    {OUT.map((o) => (
+      <g class="obj">
+        <g set:html={place(o.o, OX, o.y)} />
+        <text x={OX + hw(o.o) + 22} y={o.y + 5} class="lab">{o.t}</text>
+      </g>
+    ))}
+  </svg>
+</figure>
+<style is:global>
+  .flowd { margin: 0; }
+  .flowd svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .flowd .solid .ft { fill: #FBFBF9; } .flowd .solid .ff { fill: #E7E6E1; } .flowd .solid .fr { fill: #D2D1CB; }
+  .flowd .solid .ed, .flowd .ed { fill: none; stroke: #2a2a27; stroke-width: 1; stroke-linejoin: round; }
+  .flowd .ed.thin { stroke-width: .9; }
+  .flowd .solid.dark .ft { fill: #3a3b38; } .flowd .solid.dark .ff { fill: #1d1e1c; } .flowd .solid.dark .fr { fill: #2a2b29; }
+  .flowd .solid.dark .ed { stroke: #0f0f0e; }
+  .flowd .panel { fill: none; stroke: #6c6d68; stroke-width: 1.4; stroke-linecap: round; }
+  .flowd .conn { fill: none; stroke: #b9b7ae; stroke-width: 1; }
+  .flowd .flow-dot { fill: #6E8B3D; }
+  @media (max-width: 760px) { .flowd { overflow-x: auto; -webkit-overflow-scrolling: touch; } .flowd svg { width: 860px; max-width: none; } }
+  .flowd .node { fill: #ECEBE6; stroke: #8f8d85; stroke-width: 1; }
+  .flowd .lab { font: 500 15px Inter, sans-serif; fill: #161616; letter-spacing: -0.01em; }
+  .flowd .sub { font: 400 13px Inter, sans-serif; fill: #77766f; }
+  .flowd .c { text-anchor: middle; }
+  .flowd .obj { opacity: 0; transform: translateY(10px); transition: opacity .7s ease, transform .7s ease; }
+  .flowd.in .obj { opacity: 1; transform: none; }
+  .flowd.in .obj:nth-of-type(2) { transition-delay: .15s; } .flowd.in .obj:nth-of-type(3) { transition-delay: .3s; }
+  .flowd.in .obj:nth-of-type(4) { transition-delay: .45s; } .flowd.in .obj:nth-of-type(5) { transition-delay: .55s; }
+  .flowd.in .obj:nth-of-type(6) { transition-delay: .65s; } .flowd.in .obj:nth-of-type(7) { transition-delay: .75s; }
+  .flowd .conn { stroke-dasharray: 2000; stroke-dashoffset: 2000; transition: stroke-dashoffset 1.6s ease .4s; }
+  .flowd.in .conn { stroke-dashoffset: 0; }
+  @media (prefers-reduced-motion: reduce) { .flowd .obj, .flowd .conn { transition: none; } .flowd .flow-dot { display: none; } }
+</style>
+<script>
+  document.querySelectorAll<HTMLElement>(".flowd").forEach((el) => {
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { el.classList.add("in"); o.disconnect(); } }), { threshold: 0.25 }).observe(el);
+  });
+</script>
