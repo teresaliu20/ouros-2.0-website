@@ -44,6 +44,32 @@ npm run build    # outputs dist/
 4. Wait for Vercel to show the domain as valid (minutes to a few hours), check the live site, then cancel Framer.
 5. Old Framer URLs `/press` and `/contact` redirect via `vercel.json`.
 
+## Investor deck (`/deck`)
+
+`ourosmaterials.com/deck` shows a gate asking for email + a shared passcode, then serves the deck.
+This repo is public, so the deck is committed **encrypted** (`api/_deck-data.js`); the plaintext
+lives only in `deck-src/index.html`, which is gitignored. `api/deck.js` decrypts it server-side
+after a correct login. Logins set a 30-day cookie; changing the passcode signs everyone out.
+
+**Vercel env vars** (Project → Settings → Environment Variables, Production + Preview, then redeploy):
+
+| Name | Value |
+|---|---|
+| `DECK_PASSWORD` | the passcode you give investors (use something not guessable) |
+| `DECK_KEY` | the base64 key the deck was encrypted with |
+| `DECK_WEBHOOK_URL` | optional: Slack incoming webhook (or Zapier) pinged on every login |
+| `ATTIO_API_KEY` | optional: on login, finds/creates the person in Attio and adds an "Opened investor deck" note |
+
+Every login and wrong passcode is also written to Vercel's runtime logs (`deck: "login"`).
+
+**Update the deck:** put the new HTML at `deck-src/index.html`, then
+`DECK_KEY=... node scripts/encrypt-deck.mjs`, commit `api/_deck-data.js`, push.
+
+**Rotate the key:** generate one with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`,
+re-run the encrypt script with it, update `DECK_KEY` in Vercel, push.
+
+Log out (for testing): `/deck/logout`.
+
 ## Before launch
 
 - [ ] **Font license.** Neue Haas Grotesk Display is a commercial font. Confirm a web license (included with Adobe Fonts / Creative Cloud), or swap to Inter Display in `src/styles/global.css`.

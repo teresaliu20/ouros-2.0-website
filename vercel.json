@@ -3,6 +3,10 @@
     { "source": "/press", "destination": "/", "permanent": true },
     { "source": "/contact", "destination": "/#g-contact", "permanent": true }
   ],
+  "rewrites": [
+    { "source": "/deck", "destination": "/api/deck" },
+    { "source": "/deck/logout", "destination": "/api/deck?action=logout" }
+  ],
   "headers": [
     { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
   ]
