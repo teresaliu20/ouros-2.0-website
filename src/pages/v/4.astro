@@ -1,0 +1,499 @@
+---
+// Version 4 — AMCA-led, high fidelity. AIRCO-style documentary video, line-art history story,
+// the 1,400°C → 250°C drop as its own section, Vulcan-style text-only team.
+import Version from "../../layouts/Version.astro";
+import { hero, statement, missing, lowTemp, powderToPart, composites, foundry, useCases, how, team, close, nav } from "../../content/site";
+import { icon, glyph } from "../../components/v/lineart";
+
+const eras = [
+  ["Steel", 1856, "steel"], ["Aluminum", 1886, "aluminum"], ["Fiberglass", 1932, "fiberglass"],
+  ["Nylon", 1935, "nylon"], ["Transistor", 1947, "transistor"], ["Optical fiber", 1970, "fiber"],
+] as const;
+const EX = (i: number) => 70 + i * 86;
+const beats = [
+  { text: statement.lead, note: "Steel, aluminum, nylon, fiberglass, the transistor, optical fiber." },
+  { text: "Then the labs that made them were broken up, and the factories moved overseas.", note: "Invention stayed. Production left." },
+  { text: missing.title, note: missing.body },
+  { text: missing.stall, note: "Pilot lines, testing and qualification: the middle no one funds." },
+  { text: missing.answer, note: "Development, testing and pilot production, built to hand off to partner factories." },
+];
+const use = (name: string, x: number, y: number, s = 64, cls = "") =>
+  `<svg x="${x}" y="${y}" width="${s}" height="${s}" viewBox="0 0 64 64" class="${cls}">${icon[name]}</svg>`;
+// kiln firing profile vs Ouros profile on a 0–1,500 °C axis (chart box 0..560 × 0..300)
+const TY = (t: number) => 300 - (t / 1500) * 300;
+const kilnPath = `M0 ${TY(20)} C 60 ${TY(200)}, 150 ${TY(1100)}, 210 ${TY(1400)} L 330 ${TY(1400)} C 390 ${TY(1400)}, 470 ${TY(400)}, 560 ${TY(120)}`;
+const ourosPath = `M0 ${TY(20)} C 40 ${TY(120)}, 80 ${TY(240)}, 130 ${TY(240)} L 470 ${TY(240)} C 500 ${TY(240)}, 530 ${TY(120)}, 560 ${TY(60)}`;
+const people = [...team.founders.map((p) => ({ ...p, f: true })), ...team.advisors.map((p) => ({ ...p, f: false }))];
+const markets = [["energy", 0], ["defense", 1], ["aero", 2], ["infra", 3]] as const;
+const parts = ["panel", "bracket", "insulator", "machined"];
+// Roadmap framing (Nov 12 decision): FOUNDRY is staged, not current capability.
+const roadmap = [
+  { name: "Development and testing", body: "Formulation, pressing, curing and in-house fire, strength and durability testing, engineered to a customer’s spec." },
+  { name: "Pilot manufacturing", body: "Production-size parts, with a process built to transfer into partner-funded factories." },
+  { name: "Automated R&D", body: "Modular stations that dispense, press, cure and scan samples, with every formulation and result in one dataset." },
+];
+---
+<Version title="Ouros Materials · Version 4" current="4" theme="#0f1112">
+<div class="v4">
+  <header class="card-nav" id="cardnav">
+    <a href="#top" class="mark" aria-label="Ouros Materials home"><img src="/brand/ouros-logomark-black.svg" alt="Ouros Materials" width="46" height="20" /></a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="menu-list"><span class="sr">Menu</span><i></i><i></i></button>
+    <nav id="menu-list" aria-label="Sections">
+      {nav.map(([l, h]) => <a href={h}>{l}</a>)}
+      <a href={close.email}>Contact</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <video class="hero-vid" src="/v/media/hero-v4.mp4" poster="/v/media/hero-v4-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="hero-copy">
+      <h1>{hero.title}</h1>
+      <p class="beat2">Rebuilding America’s materials frontier.</p>
+    </div>
+    <img class="hero-word" src="/brand/ouros-wordmark-line-white.svg" alt="" />
+    <span class="shot-tag hero-tag">Draft reel: reference plant footage (rights needed before launch) + Veo powder shot. CNC clip next.</span>
+  </section>
+
+  <section class="intro wrap">
+    <p class="lede-xl">{hero.sub}</p>
+  </section>
+
+  <!-- HISTORY STORY -->
+  <section class="story" id="why" style={`--n:${beats.length}`}>
+    <div class="stage">
+      <div class="art" aria-hidden="true">
+        <p class="art-note"></p>
+        <svg viewBox="0 0 640 440" class="lines">
+          <g class="b b0 b1">
+            <line x1="40" y1="300" x2="560" y2="300" class="ln" />
+            {eras.map(([n, y, ic], i) => {
+              const cx = EX(i), top = 176;
+              return (
+                <g class="era">
+                  <line x1={cx} y1="300" x2={cx} y2={top + 64} class="ln thin" />
+                  <circle cx={cx} cy="300" r="3.5" class="dot" />
+                  <g set:html={use(ic, cx - 28, top, 56)} />
+                  <text x={cx} y={top - 26} class="tx c">{n}</text>
+                  <text x={cx} y="326" class="tx c yr">{y}</text>
+                </g>
+              );
+            })}
+            <g class="exit">
+              <path d="M560 300 C 600 300, 600 190, 626 150" class="ln dash" />
+              <g set:html={use("ship", 560, 70, 64)} />
+              <text x="592" y="60" class="tx c">Production moves offshore</text>
+            </g>
+          </g>
+          <g class="b b2 b3 b4">
+            <g set:html={use("flask", 50, 168, 84)} /><text x="92" y="282" class="tx c">Invention</text>
+            <g class="fac" set:html={use("factory", 506, 168, 84)} /><text x="548" y="282" class="tx c">Factories</text>
+            <g class="gapbox"><rect x="196" y="140" width="248" height="160" rx="6" class="ln dash" /><text x="320" y="128" class="tx c">The missing middle</text></g>
+            <line x1="138" y1="214" x2="196" y2="214" class="ln" /><line x1="444" y1="214" x2="502" y2="214" class="ln dash" />
+            <g class="stalled" set:html={use("shelf", 268, 160, 104)} />
+            <text x="320" y="324" class="tx c stalled">On the shelf for decades</text>
+            <g class="bridge">
+              {[["R&D", "flask"], ["Testing", "chamber"], ["Pilot", "factory"]].map(([t, ic], i) => (
+                <g>
+                  <rect x={212 + i * 76} y="174" width="64" height="80" rx="4" class="ln solid" />
+                  <g set:html={use(ic, 220 + i * 76, 182, 48)} />
+                  <text x={244 + i * 76} y="246" class="tx c sm">{t}</text>
+                </g>
+              ))}
+              <line x1="138" y1="214" x2="212" y2="214" class="ln solid" /><line x1="428" y1="214" x2="502" y2="214" class="ln solid" />
+              <text x="320" y="128" class="tx c strong">Ouros</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="words">
+        {beats.map((b, i) => <p class={`beat ${i === 0 ? "on" : ""}`}>{b.text}</p>)}
+        <ol class="ticks" aria-hidden="true">{beats.map((_, i) => <li class={i === 0 ? "on" : ""}></li>)}</ol>
+      </div>
+    </div>
+    <div class="beat-notes" hidden>{beats.map((b) => <span>{b.note}</span>)}</div>
+  </section>
+
+  <!-- TEMPERATURE: its own section -->
+  <section class="temp" id="tech">
+    <div class="t-stage">
+      <video class="t-vid" src="/v/media/kilnline.mp4" poster="/v/media/kilnline-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+      <div class="t-inner">
+        <div class="t-left">
+          <p class="t-label">Firing temperature</p>
+          <p class="t-num" aria-live="off"><span id="tnum">1,400</span><span class="deg">°C</span></p>
+          <div class="t-steps">
+            <p class="t-step on">For 30,000 years, ceramics have meant fire. Kilns run at 1,000–1,400°C, hot enough to burn out any polymer.</p>
+            <p class="t-step">Our solidification chemistry works at a fraction of the heat.</p>
+            <p class="t-step">Below 250°C, polymers, and eventually metals, can live inside a ceramic matrix.</p>
+          </div>
+        </div>
+        <figure class="t-chart" aria-label="Kiln firing reaches 1,400°C; the Ouros process stays below 250°C">
+          <svg viewBox="-56 -20 640 360">
+            {[0, 250, 500, 1000, 1400].map((t) => (
+              <g><line x1="0" x2="560" y1={TY(t)} y2={TY(t)} class={`grid ${t === 250 ? "g250" : ""} ${t === 1400 ? "g1400" : ""}`} /><text x="-10" y={TY(t) + 4} class="ax" text-anchor="end">{t.toLocaleString()}</text></g>
+            ))}
+            <text x="0" y="330" class="ax">Time in process</text>
+            <text x="-46" y="-6" class="ax">°C</text>
+            <path d={kilnPath} class="curve kiln" pathLength="1" />
+            <path d={ourosPath} class="curve ouros" pathLength="1" />
+            <text x="270" y={TY(1400) - 10} class="lab kiln-l" text-anchor="middle">Conventional kiln firing</text>
+            <text x="300" y={TY(240) - 10} class="lab ouros-l" text-anchor="middle">Ouros low-temperature solidification</text>
+          </svg>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- POWDER TO PART -->
+  <section class="ptp wrap" id="materials">
+    <div class="ptp-head">
+      <h2 class="serif h1">{powderToPart.title}</h2>
+      <p class="lede">{powderToPart.body}</p>
+    </div>
+    <div class="flow" aria-label="Mineral feedstock and a second phase go into the Ouros process and come out as engineered parts">
+      <div class="f-in">
+        <div class="f-node"><Fragment set:html={glyph("powder")} /><span>Ceramic matrix<br /><em>Abundant mineral feedstock</em></span></div>
+        <div class="f-node"><Fragment set:html={glyph("pellets")} /><span>Second phase<br /><em>Polymer, later metal alloy</em></span></div>
+      </div>
+      <div class="f-arrow" aria-hidden="true"></div>
+      <div class="f-core"><Fragment set:html={glyph("chamber", "big")} /><span>{composites.process}<br /><em>No kiln</em></span></div>
+      <div class="f-arrow" aria-hidden="true"></div>
+      <div class="f-out">
+        {parts.map((p, i) => <div class="f-part"><Fragment set:html={glyph(p)} /><span>{powderToPart.parts[i]}</span></div>)}
+      </div>
+    </div>
+    <div class="docs">
+      <figure><video src="/v/media/powder.mp4" poster="/v/media/powder-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video><figcaption>Mineral powder</figcaption></figure>
+      <figure><video src="/v/media/rollers.mp4" poster="/v/media/rollers-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video><figcaption>Parts at production scale</figcaption></figure>
+    </div>
+    <div class="fam">
+      {composites.families.map((f) => (
+        <article>
+          <h3 class="serif">{f.name}</h3>
+          {f.status && <p class="status">{f.status}</p>}
+          <ul>{f.traits.map((t) => <li>{t}</li>)}</ul>
+          <p class="uses">{f.uses.join(", ")}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- FOUNDRY (roadmap) -->
+  <section class="foundry" id="foundry">
+    <div class="wrap">
+      <div class="f-head">
+        <h2 class="serif h1">{foundry.title}</h2>
+        <p class="lede">We’re building toward Ouros Foundry. {foundry.body}</p>
+      </div>
+      <figure class="f-fig">
+        <video src="/v/media/rollerline.mp4" poster="/v/media/rollerline-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+      </figure>
+      <ol class="f-steps">
+        {roadmap.map((s, i) => (
+          <li><span class="stage-n">Stage {i + 1}</span><h3 class="serif">{s.name}</h3><p>{s.body}</p></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- MARKETS -->
+  <section class="where wrap">
+    <h2 class="serif h1">Built for the systems America runs on.</h2>
+    <div class="rows">
+      {markets.map(([ic, i]) => (
+        <article><Fragment set:html={glyph(ic, "mk")} /><h3 class="serif">{useCases.items[i].name}</h3><p>{useCases.items[i].body}</p></article>
+      ))}
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="how wrap" id="how">
+    <h2 class="serif h1">{how.title}</h2>
+    <p class="lede">{how.body}</p>
+    <ol>
+      {how.steps.map((s) => <li><h3 class="serif">{s.name}</h3><p class="phase">{s.phase}</p><p>{s.body}</p></li>)}
+    </ol>
+  </section>
+
+  <!-- TEAM: Vulcan-style, no photos -->
+  <section class="team wrap" id="team">
+    <h2 class="serif h1">{team.title}</h2>
+    <div class="t-rows">
+      <p class="t-group">Founders</p>
+      {people.filter((p) => p.f).map((p) => <article><h3>{p.name}</h3><p class="role">{p.role}</p><p class="bio">{p.bio}</p></article>)}
+      <p class="t-group">Advisors</p>
+      {people.filter((p) => !p.f).map((p) => <article><h3>{p.name}</h3><p class="role">{p.role}</p><p class="bio">{p.bio}</p></article>)}
+    </div>
+  </section>
+
+  <!-- CLOSE -->
+  <section class="band">
+    <video src="/v/media/aerial.mp4" poster="/v/media/aerial-poster.webp" autoplay muted loop playsinline aria-hidden="true"></video>
+    <div class="band-copy"><h2 class="serif">{close.title}</h2><a class="btn" href={close.email}>{close.cta}</a></div>
+  </section>
+  <footer class="foot">
+    <div class="wrap foot-row"><a href={close.linkedin}>LinkedIn</a><a href={close.email}>Contact</a><span>{close.place}</span><span>© 2026 Ouros Materials</span></div>
+    <img class="foot-word" src="/brand/ouros-wordmark-line-white.svg" alt="Ouros Materials" />
+  </footer>
+</div>
+
+<style is:global>
+  .v4 { --paper: #ECEBE6; --paper2: #F4F3EF; --ink: #161616; --graphite: #1C1D1C; --mute: #64645d; --rule: #cfcdc5; --heat: #D2602F; --cool: #7E9AAD; background: var(--paper); color: var(--ink); font: 400 17px/1.55 Inter, "Helvetica Neue", Arial, sans-serif; position: relative; }
+  .v4::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: .14; mix-blend-mode: multiply; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .v4 .wrap { max-width: 1280px; margin: 0 auto; padding-left: clamp(20px, 4vw, 48px); padding-right: clamp(20px, 4vw, 48px); }
+  .v4 .serif { font-family: Newsreader, Georgia, serif; font-weight: 400; letter-spacing: -0.012em; }
+  .v4 .h1 { font-size: clamp(38px, 4.6vw, 68px); line-height: 1.02; margin: 0; max-width: 18ch; }
+  .v4 .lede { color: var(--mute); font-size: clamp(17px, 1.3vw, 19px); max-width: 56ch; margin: 22px 0 0; }
+  .v4 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .v4 svg.g { width: 56px; height: 56px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; flex: none; }
+  .v4 svg.g .fill { fill: currentColor; stroke: none; }
+  .v4 video { display: block; }
+
+  /* Card nav (AMCA) */
+  .v4 .card-nav { position: fixed; top: 14px; right: 14px; z-index: 60; background: #F6F5F1; border: 1px solid #d9d7cf; border-radius: 6px; padding: 12px 14px; min-width: 120px; }
+  .v4 .card-nav .mark { display: block; width: 46px; margin: 0 auto 8px; }
+  .v4 .card-nav .menu { display: block; margin-left: auto; width: 22px; height: 14px; background: none; border: 0; padding: 0; cursor: pointer; position: relative; }
+  .v4 .card-nav .menu i { position: absolute; left: 0; right: 0; height: 1.5px; background: var(--ink); transition: transform .2s; }
+  .v4 .card-nav .menu i:first-of-type { top: 3px; } .v4 .card-nav .menu i:last-of-type { bottom: 3px; }
+  .v4 .card-nav nav { display: none; flex-direction: column; margin-top: 10px; font: 600 12px/1 GeistMono, monospace; text-transform: uppercase; letter-spacing: .04em; }
+  .v4 .card-nav nav a { text-decoration: none; padding: 10px 0; border-top: 1px solid #dddbd3; }
+  .v4 .card-nav.open nav { display: flex; }
+  .v4 .card-nav.open .menu i:first-of-type { transform: translateY(3.5px) rotate(45deg); } .v4 .card-nav.open .menu i:last-of-type { transform: translateY(-3.5px) rotate(-45deg); }
+
+  @media (max-width: 760px) { .v4 .card-nav { min-width: 0; padding: 8px 10px; top: 10px; right: 10px; } .v4 .card-nav .mark { width: 34px; margin-bottom: 6px; } .v4 .lines { width: 100%; } }
+  /* Hero */
+  .v4 .hero { position: relative; height: 100svh; min-height: 640px; overflow: hidden; background: #0f1112; color: #fff; }
+  .v4 .hero-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .v4 .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,12,14,.55) 0%, rgba(10,12,14,.12) 34%, rgba(10,12,14,0) 55%, rgba(10,12,14,.45) 100%); }
+  .v4 .hero-copy { position: relative; z-index: 2; text-align: center; padding: clamp(84px, 13vh, 140px) 20px 0; }
+  .v4 .hero h1 { margin: 0 auto; font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: clamp(52px, 8.2vw, 132px); line-height: .92; letter-spacing: -0.03em; max-width: 10ch; }
+  .v4 .beat2 { margin: 22px 0 0; font-family: Newsreader, Georgia, serif; font-style: italic; font-size: clamp(20px, 2vw, 28px); color: rgba(255,255,255,.88); }
+  .v4 .hero-word { position: absolute; z-index: 2; left: clamp(20px, 4vw, 48px); bottom: 26px; width: calc(100% - 2 * clamp(20px, 4vw, 48px)); height: auto; opacity: .92; }
+  .v4 .hero-tag { top: 14px; left: 14px; bottom: auto; max-width: 420px; }
+  .v4 .intro { padding-top: clamp(80px, 10vw, 140px); }
+  .v4 .lede-xl { margin: 0; font-family: Newsreader, Georgia, serif; font-size: clamp(26px, 2.6vw, 40px); line-height: 1.18; max-width: 30ch; letter-spacing: -0.01em; }
+
+  /* History story */
+  .v4 .story { position: relative; height: calc(var(--n) * 85vh + 100vh); margin-top: clamp(80px, 10vw, 140px); }
+  .v4 .stage { position: sticky; top: 0; height: 100vh; padding: 14px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+  .v4 .art { position: relative; background: var(--graphite); border-radius: 8px 0 0 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #d8d8d2; }
+  .v4 .art-note { position: absolute; top: 22px; left: 24px; right: 24px; margin: 0; color: #b9b9b2; font-size: 13.5px; line-height: 1.45; max-width: 46ch; min-height: 3em; }
+  .v4 .lines { width: min(94%, 820px); height: auto; margin-top: 30px; }
+  .v4 .lines svg { overflow: visible; fill: none; stroke: #d8d8d2; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+  .v4 .lines svg .fill { fill: #d8d8d2; stroke: none; }
+  .v4 .lines .ln { fill: none; stroke: #d4d4ce; stroke-width: 1.2; }
+  .v4 .lines .ln.thin { stroke-width: .8; stroke: #8f8f88; }
+  .v4 .lines .ln.dash { stroke-dasharray: 4 5; stroke: #8f8f88; }
+  .v4 .lines .ln.solid { stroke: #fff; stroke-width: 1.5; }
+  .v4 .lines .dot { fill: #fff; }
+  .v4 .lines .tx { fill: #bdbdb6; font: 500 10.5px GeistMono, monospace; letter-spacing: .02em; }
+  .v4 .lines .tx.c { text-anchor: middle; }
+  .v4 .lines .tx.sm { font-size: 9.5px; }
+  .v4 .lines .tx.yr { fill: #fff; font-size: 11.5px; }
+  .v4 .lines .tx.strong { fill: #fff; font-size: 12.5px; font-weight: 700; }
+  .v4 .lines .b, .v4 .lines .b g, .v4 .lines .b text { transition: opacity .6s ease; }
+  .v4 .lines .b { opacity: 0; }
+  .v4 .words { position: relative; background: var(--paper2); border-radius: 0 8px 8px 0; }
+  .v4 .beat { position: absolute; left: clamp(28px, 4vw, 56px); right: clamp(28px, 4vw, 56px); bottom: clamp(56px, 8vh, 96px); margin: 0; font-family: Newsreader, Georgia, serif; font-size: clamp(30px, 3vw, 46px); line-height: 1.08; letter-spacing: -0.015em; max-width: 16ch; opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease; }
+  .v4 .beat.on { opacity: 1; transform: none; }
+  .v4 .ticks { position: absolute; top: 24px; left: clamp(28px, 4vw, 56px); display: flex; gap: 6px; list-style: none; padding: 0; margin: 0; }
+  .v4 .ticks li { width: 20px; height: 2px; background: #cfcdc5; transition: background .3s; }
+  .v4 .ticks li.on { background: var(--ink); }
+  .v4 .story[data-b="0"] .b0, .v4 .story[data-b="1"] .b1, .v4 .story[data-b="2"] .b2, .v4 .story[data-b="3"] .b3, .v4 .story[data-b="4"] .b4 { opacity: 1; }
+  .v4 .story .exit { opacity: 0; } .v4 .story[data-b="1"] .exit { opacity: 1; } .v4 .story[data-b="1"] .era { opacity: .3; }
+  .v4 .story .stalled, .v4 .story .bridge { opacity: 0; }
+  .v4 .story[data-b="3"] .stalled { opacity: 1; }
+  .v4 .story[data-b="2"] .fac, .v4 .story[data-b="3"] .fac { opacity: .45; }
+  .v4 .story[data-b="4"] .bridge { opacity: 1; } .v4 .story[data-b="4"] .gapbox { opacity: 0; }
+  @media (max-width: 860px) {
+    .v4 .stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: 56% 44%; padding: 10px; }
+    .v4 .art { border-radius: 8px 8px 0 0; } .v4 .words { border-radius: 0 0 8px 8px; }
+    .v4 .beat { bottom: 24px; font-size: clamp(24px, 6.6vw, 32px); }
+    .v4 .art-note { font-size: 12px; }
+  }
+
+  /* Temperature */
+  .v4 .temp { position: relative; height: 320vh; }
+  .v4 .t-stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--graphite); color: #EDEDE8; transition: background-color .2s linear, color .2s linear; }
+  .v4 .t-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .34; }
+  .v4 .t-inner { position: relative; z-index: 2; height: 100%; max-width: 1360px; margin: 0 auto; padding: clamp(72px, 10vh, 120px) clamp(20px, 4vw, 48px) clamp(40px, 6vh, 72px); display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(24px, 4vw, 64px); align-items: center; }
+  .v4 .t-label { margin: 0; font: 600 12px/1 GeistMono, monospace; text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+  .v4 .t-num { margin: 14px 0 0; font-family: Newsreader, Georgia, serif; font-weight: 400; font-size: clamp(88px, 13vw, 210px); line-height: .9; letter-spacing: -0.04em; font-variant-numeric: tabular-nums lining-nums; color: var(--tc, var(--heat)); white-space: nowrap; }
+  .v4 .t-num .deg { font-size: .42em; letter-spacing: 0; margin-left: .06em; vertical-align: .9em; }
+  .v4 .t-steps { position: relative; min-height: 7.5em; margin-top: 28px; max-width: 30ch; }
+  .v4 .t-step { position: absolute; inset: 0 auto auto 0; margin: 0; font-family: Newsreader, Georgia, serif; font-size: clamp(22px, 2vw, 30px); line-height: 1.18; opacity: 0; transform: translateY(10px); transition: opacity .45s, transform .45s; }
+  .v4 .t-step.on { opacity: 1; transform: none; }
+  .v4 .t-chart { margin: 0; padding: 22px 20px 12px; border-radius: 6px; background: rgba(16,18,19,var(--cbg, .55)); transition: background-color .2s; }
+  .v4 .t-chart svg { width: 100%; height: auto; overflow: visible; }
+  .v4 .t-chart .grid { stroke: currentColor; stroke-opacity: .18; stroke-width: 1; }
+  .v4 .t-chart .grid.g250 { stroke: var(--cool); stroke-opacity: .9; stroke-dasharray: 3 4; }
+  .v4 .t-chart .grid.g1400 { stroke: var(--heat); stroke-opacity: .7; stroke-dasharray: 3 4; }
+  .v4 .t-chart .ax { fill: currentColor; fill-opacity: .7; font: 500 11px GeistMono, monospace; }
+  .v4 .t-chart .curve { fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--d, 1); }
+  .v4 .t-chart .kiln { stroke: var(--heat); --d: var(--dk, 1); }
+  .v4 .t-chart .ouros { stroke: var(--cool); stroke-width: 3; --d: var(--do, 1); }
+  .v4 .t-chart .lab { font: 600 12px GeistMono, monospace; }
+  .v4 .t-chart .kiln-l { fill: var(--heat); opacity: var(--lk, 0); }
+  .v4 .t-chart .ouros-l { fill: var(--cool); opacity: var(--lo, 0); }
+  @media (max-width: 860px) {
+    .v4 .t-inner { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 18px; padding-top: 64px; }
+    .v4 .t-steps { min-height: 6em; margin-top: 16px; }
+  }
+
+  /* Powder to part */
+  .v4 .ptp { padding-top: clamp(96px, 12vw, 160px); }
+  .v4 .ptp-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+  .v4 .ptp-head .lede { margin: 0; }
+  .v4 .flow { margin-top: 56px; display: grid; grid-template-columns: minmax(0, 1fr) 56px minmax(0, .8fr) 56px minmax(0, 1.3fr); align-items: center; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); padding: 36px 0; }
+  .v4 .f-in { display: flex; flex-direction: column; gap: 22px; }
+  .v4 .f-node, .v4 .f-core { display: flex; align-items: center; gap: 14px; }
+  .v4 .f-node span, .v4 .f-core span { font-size: 15px; line-height: 1.35; }
+  .v4 .f-node em, .v4 .f-core em, .v4 .f-part span { font-style: normal; color: var(--mute); font-size: 13.5px; }
+  .v4 .f-core { flex-direction: column; text-align: center; }
+  .v4 .f-core svg.big { width: 110px; height: 110px; }
+  .v4 .f-arrow { height: 1px; background: var(--ink); position: relative; margin: 0 6px; }
+  .v4 .f-arrow::after { content: ""; position: absolute; right: -1px; top: -4px; width: 8px; height: 8px; border-top: 1px solid var(--ink); border-right: 1px solid var(--ink); transform: rotate(45deg); }
+  .v4 .f-out { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .v4 .f-part { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .v4 .f-part svg.g { width: 64px; height: 64px; }
+  .v4 .docs { margin-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 14px; }
+  .v4 .docs figure { margin: 0; position: relative; }
+  .v4 .docs video { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 4px; background: #222; }
+  .v4 .docs figcaption { margin-top: 8px; font-size: 13.5px; color: var(--mute); }
+  .v4 .fam { margin-top: 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; }
+  .v4 .fam article { border-top: 1px solid var(--ink); padding-top: 18px; }
+  .v4 .fam h3 { font-size: clamp(26px, 2.4vw, 34px); margin: 0; }
+  .v4 .fam .status { margin: 4px 0 0; color: var(--mute); font-size: 15px; }
+  .v4 .fam ul { list-style: none; padding: 0; margin: 18px 0 0; }
+  .v4 .fam li { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .v4 .fam .uses { color: var(--mute); font-size: 15px; margin: 12px 0 0; }
+  @media (max-width: 960px) {
+    .v4 .ptp-head, .v4 .fam, .v4 .docs { grid-template-columns: minmax(0, 1fr); }
+    .v4 .flow { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .v4 .f-arrow { width: 1px; height: 36px; margin: 14px auto; }
+    .v4 .f-arrow::after { right: -4px; top: auto; bottom: -1px; transform: rotate(135deg); }
+    .v4 .f-out { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 20px; }
+  }
+
+  /* Foundry */
+  .v4 .foundry { margin-top: clamp(96px, 12vw, 160px); background: var(--graphite); color: #EDEDE8; padding: clamp(96px, 12vw, 160px) 0; }
+  .v4 .foundry .lede { color: #a8a8a1; }
+  .v4 .f-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+  .v4 .f-head .lede { margin: 0; }
+  .v4 .f-fig { margin: 56px 0 0; }
+  .v4 .f-fig video { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; border-radius: 6px; }
+  .v4 .f-steps { list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .v4 .f-steps li { border-top: 1px solid #3a3b39; padding-top: 16px; }
+  .v4 .stage-n { font: 600 12px/1 GeistMono, monospace; text-transform: uppercase; letter-spacing: .05em; color: #8f8f88; }
+  .v4 .f-steps h3 { font-size: 26px; margin: 10px 0 6px; }
+  .v4 .f-steps p { margin: 0; color: #a8a8a1; font-size: 15.5px; }
+  @media (max-width: 860px) { .v4 .f-head, .v4 .f-steps { grid-template-columns: minmax(0, 1fr); } .v4 .f-fig video { aspect-ratio: 16 / 10; } }
+
+  /* Markets */
+  .v4 .where { padding-top: clamp(96px, 12vw, 160px); }
+  .v4 .rows { margin-top: 48px; border-top: 1px solid var(--ink); }
+  .v4 .rows article { display: grid; grid-template-columns: 80px minmax(0, 260px) minmax(0, 1fr); gap: 28px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .v4 .rows svg.mk { width: 64px; height: 64px; }
+  .v4 .rows svg .accent { stroke: var(--ink); stroke-width: 1.8; }
+  .v4 .rows h3 { margin: 0; font-size: clamp(26px, 2.4vw, 36px); }
+  .v4 .rows p { margin: 0; color: var(--mute); max-width: 52ch; }
+  @media (max-width: 760px) { .v4 .rows article { grid-template-columns: 64px minmax(0, 1fr); gap: 8px 16px; } .v4 .rows p { grid-column: 2; } }
+
+  /* How */
+  .v4 .how { padding-top: clamp(96px, 12vw, 160px); }
+  .v4 .how ol { list-style: none; padding: 0; margin: 48px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; counter-reset: s; }
+  .v4 .how li { counter-increment: s; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .v4 .how li::before { content: counter(s); font-family: Newsreader, Georgia, serif; font-size: 44px; line-height: 1; display: block; margin-bottom: 10px; color: #9a998f; }
+  .v4 .how h3 { margin: 0; font-size: 26px; }
+  .v4 .how .phase { margin: 2px 0 10px; color: var(--mute); font-size: 14.5px; }
+  .v4 .how li p:last-child { margin: 0; font-size: 15.5px; }
+  @media (max-width: 860px) { .v4 .how ol { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Team (Vulcan rows) */
+  .v4 .team { padding: clamp(96px, 12vw, 160px) clamp(20px, 4vw, 48px) clamp(96px, 12vw, 160px); }
+  .v4 .t-rows { margin-top: 48px; border-top: 1px solid var(--ink); }
+  .v4 .t-group { margin: 28px 0 6px; font: 600 12px/1 GeistMono, monospace; text-transform: uppercase; letter-spacing: .05em; color: var(--mute); }
+  .v4 .t-rows article { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+  .v4 .t-rows h3 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .v4 .t-rows .role { margin: 0; color: var(--mute); font-size: 15px; }
+  .v4 .t-rows .bio { margin: 0; font-size: 15.5px; max-width: 60ch; }
+  @media (max-width: 760px) { .v4 .t-rows article { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+
+  /* Close */
+  .v4 .band { position: relative; height: 70vh; min-height: 460px; overflow: hidden; color: #fff; display: flex; align-items: flex-end; }
+  .v4 .band video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .v4 .band::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10,12,14,.1), rgba(10,12,14,.6)); }
+  .v4 .band-copy { position: relative; z-index: 2; padding: 0 clamp(20px, 4vw, 48px) clamp(40px, 6vw, 72px); max-width: 1280px; margin: 0 auto; width: 100%; }
+  .v4 .band h2 { margin: 0; font-size: clamp(36px, 4.4vw, 64px); line-height: 1.04; max-width: 18ch; }
+  .v4 .btn { display: inline-block; margin-top: 28px; border: 1px solid #fff; color: #fff; text-decoration: none; padding: 13px 18px; border-radius: 3px; font-size: 15px; }
+  .v4 .foot { background: var(--graphite); color: #EDEDE8; padding: 28px 0 0; overflow: hidden; }
+  .v4 .foot-row { display: flex; gap: 28px; flex-wrap: wrap; font-size: 14.5px; color: #9a9a93; }
+  .v4 .foot-row a { color: #EDEDE8; text-decoration: none; }
+  .v4 .foot-word { display: block; width: calc(100% - 2 * clamp(20px, 4vw, 48px)); margin: 72px auto 64px; height: auto; }
+</style>
+<script>
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const prog = (el: HTMLElement) => clamp(-el.getBoundingClientRect().top / (el.offsetHeight - innerHeight));
+
+  // History story
+  const story = document.querySelector<HTMLElement>(".v4 .story")!;
+  const beats = [...story.querySelectorAll<HTMLElement>(".beat")];
+  const ticks = [...story.querySelectorAll<HTMLElement>(".ticks li")];
+  const notes = [...story.querySelectorAll<HTMLElement>(".beat-notes span")].map((s) => s.textContent || "");
+  const note = story.querySelector<HTMLElement>(".art-note")!;
+  let cur = -1;
+  const setBeat = (b: number) => {
+    if (b === cur) return; cur = b; story.dataset.b = String(b);
+    beats.forEach((el, i) => el.classList.toggle("on", i === b));
+    ticks.forEach((el, i) => el.classList.toggle("on", i <= b));
+    note.textContent = notes[b];
+  };
+
+  // Temperature
+  const temp = document.querySelector<HTMLElement>(".v4 .temp")!;
+  const tstage = temp.querySelector<HTMLElement>(".t-stage")!;
+  const tvid = temp.querySelector<HTMLElement>(".t-vid")!;
+  const tnum = document.getElementById("tnum")!;
+  const steps = [...temp.querySelectorAll<HTMLElement>(".t-step")];
+  const mix = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+  const HEAT = [210, 96, 47], COOL = [126, 154, 173], GR = [28, 29, 28], PAPER = [236, 235, 230], LIGHT = [237, 237, 232], INK = [22, 22, 22];
+  const drawTemp = () => {
+    const p = reduce ? 1 : prog(temp);
+    const k = clamp(p / 0.28);                 // draw kiln curve
+    const d = clamp((p - 0.3) / 0.4);          // temperature drop
+    const e = d * d * (3 - 2 * d);
+    const T = Math.round(1400 - 1150 * e);
+    tnum.textContent = T.toLocaleString("en-US");
+    tstage.style.setProperty("--dk", String(1 - k));
+    tstage.style.setProperty("--do", String(1 - clamp((p - 0.38) / 0.35)));
+    tstage.style.setProperty("--lk", String(k));
+    tstage.style.setProperty("--lo", String(clamp((p - 0.6) / 0.15)));
+    tstage.style.setProperty("--tc", `rgb(${mix(HEAT, COOL, e).join(",")})`);
+    tstage.style.backgroundColor = `rgb(${mix(GR, PAPER, clamp((e - 0.55) / 0.45)).join(",")})`;
+    tstage.style.color = `rgb(${mix(LIGHT, INK, clamp((e - 0.55) / 0.45)).join(",")})`;
+    tstage.style.setProperty("--cbg", String(0.55 * (1 - clamp((e - 0.4) / 0.4))));
+    tvid.style.opacity = String(0.34 * (1 - e));
+    const s = p < 0.3 ? 0 : p < 0.72 ? 1 : 2;
+    steps.forEach((el, i) => el.classList.toggle("on", i === s));
+  };
+
+  const onScroll = () => {
+    setBeat(Math.min(beats.length - 1, Math.floor(prog(story) * beats.length)));
+    drawTemp();
+  };
+  addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll); onScroll();
+
+  // Pause offscreen videos to save battery
+  const vids = [...document.querySelectorAll<HTMLVideoElement>(".v4 video")];
+  const io = new IntersectionObserver((es) => es.forEach((e) => { const v = e.target as HTMLVideoElement; if (e.isIntersecting) { if (!reduce) v.play().catch(() => {}); } else v.pause(); }), { rootMargin: "100px" });
+  vids.forEach((v) => { if (reduce) v.removeAttribute("autoplay"); io.observe(v); });
+
+  const nav = document.getElementById("cardnav")!;
+  const btn = nav.querySelector("button")!;
+  btn.addEventListener("click", () => { const o = !nav.classList.contains("open"); nav.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); });
+  nav.querySelectorAll("nav a").forEach((a) => a.addEventListener("click", () => { nav.classList.remove("open"); btn.setAttribute("aria-expanded", "false"); }));
+</script>
+</Version>
