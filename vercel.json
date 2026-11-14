@@ -1,13 +1,43 @@
 {
   "redirects": [
-    { "source": "/press", "destination": "/", "permanent": true },
-    { "source": "/contact", "destination": "/#g-contact", "permanent": true }
+    {
+      "source": "/press",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/contact",
+      "destination": "/#g-contact",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/deck", "destination": "/api/deck" },
-    { "source": "/deck/logout", "destination": "/api/deck?action=logout" }
+    {
+      "source": "/deck",
+      "destination": "/api/deck"
+    },
+    {
+      "source": "/deck/logout",
+      "destination": "/api/deck?action=logout"
+    },
+    {
+      "source": "/deck-teaser",
+      "destination": "/api/teaser"
+    },
+    {
+      "source": "/deck-teaser/logout",
+      "destination": "/api/teaser?action=logout"
+    }
   ],
   "headers": [
-    { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+    {
+      "source": "/media/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
   ]
 }
