@@ -271,7 +271,7 @@ function gate(status, error = "", email = "") {
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Ouros Materials · Investor Deck</title>
+<title>Ouros Materials · Investor Teaser</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
 @font-face{font-family:'Inter';src:url('/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
@@ -295,9 +295,9 @@ button:hover{background:#E0552B}
 .fine{font-size:12px;color:#7a7872;line-height:1.5}
 .fine a{color:inherit}
 @media (max-width:820px){main{grid-template-columns:1fr;gap:40px;padding:24px 24px 32px}header,footer{padding:22px 24px}}
-</style></head>
+body{background:#2A1F18;color:#F1EBE3}header,footer,.lede,label,.fine{color:#B9AC9C}form{border-top-color:rgba(241,235,227,.18)}input{color:#F1EBE3;border-bottom-color:rgba(241,235,227,.35)}input::placeholder{color:rgba(241,235,227,.4)}button{background:#F1EBE3;color:#2A1F18}button:hover{background:#E0552B;color:#fff}</style></head>
 <body>
-<header><a href="/"><img src="/brand/ouros-logo-primary-black.svg" alt="Ouros Materials"></a><span>Confidential</span></header>
+<header><a href="/"><img src="/brand/ouros-logo-primary-white.svg" alt="Ouros Materials"></a><span>Confidential</span></header>
 <main>
   <div>
     <h1>Rebuilding America's materials <em>frontier.</em></h1>
