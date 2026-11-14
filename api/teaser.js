@@ -295,19 +295,20 @@ button:hover{background:#E0552B}
 .fine{font-size:12px;color:#7a7872;line-height:1.5}
 .fine a{color:inherit}
 @media (max-width:820px){main{grid-template-columns:1fr;gap:40px;padding:24px 24px 32px}header,footer{padding:22px 24px}}
-body{background:#2A1F18;color:#F1EBE3}header,footer,.lede,label,.fine{color:#B9AC9C}form{border-top-color:rgba(241,235,227,.18)}input{color:#F1EBE3;border-bottom-color:rgba(241,235,227,.35)}input::placeholder{color:rgba(241,235,227,.4)}button{background:#F1EBE3;color:#2A1F18}button:hover{background:#E0552B;color:#fff}</style></head>
+.tpill{display:inline-flex;align-items:center;gap:8px;margin-bottom:22px;font-family:GeistMono,ui-monospace,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:#E0552B;color:#fff;padding:7px 14px;border-radius:999px}.tpill:before{content:'';width:6px;height:6px;border-radius:50%;background:#fff}</style></head>
 <body>
-<header><a href="/"><img src="/brand/ouros-logo-primary-white.svg" alt="Ouros Materials"></a><span>Confidential</span></header>
+<header><a href="/"><img src="/brand/ouros-logo-primary-black.svg" alt="Ouros Materials"></a><span>Investor teaser &middot; Confidential</span></header>
 <main>
   <div>
+    <span class="tpill">Investor teaser</span>
     <h1>Rebuilding America's materials <em>frontier.</em></h1>
-    <p class="lede">Our investor deck is private. Enter your email and the passcode we sent you.</p>
+    <p class="lede">A short preview of the Ouros investor deck. Enter your email and the passcode we sent you.</p>
   </div>
   <form method="POST" action="/deck-teaser" autocomplete="on">
     ${error ? `<p class="err" role="alert">${esc(error)}</p>` : ""}
     <label>Work email<input type="email" name="email" required autocomplete="email" value="${esc(email)}" ${email ? "" : "autofocus"}></label>
     <label>Passcode<input type="password" name="password" required autocomplete="current-password" ${email ? "autofocus" : ""}></label>
-    <button type="submit"><span>View deck</span><span>→</span></button>
+    <button type="submit"><span>View teaser</span><span>→</span></button>
     <p class="fine">Your email is shared with Ouros Materials so we know who has the deck. Need a passcode? <a href="mailto:${CONTACT}">${CONTACT}</a></p>
   </form>
 </main>
