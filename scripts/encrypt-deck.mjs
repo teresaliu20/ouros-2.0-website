@@ -13,7 +13,7 @@ if (!keyB64) throw new Error("Set DECK_KEY (the same base64 value stored in Verc
 const key = Buffer.from(keyB64, "base64");
 if (key.length !== 32) throw new Error("DECK_KEY must decode to 32 bytes.");
 
-const html = readFileSync(new URL("../deck-src/index.html", import.meta.url));
+const html = readFileSync(process.argv[2] || new URL("../deck-src/index.html", import.meta.url));
 const iv = randomBytes(12);
 const cipher = createCipheriv("aes-256-gcm", key, iv);
 // Web Crypto (used by the edge function) expects the auth tag appended to the ciphertext.

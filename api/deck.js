@@ -14,6 +14,7 @@
 //                         Resend account is registered to DECK_NOTIFY_EMAIL)
 //   DECK_NOTIFY_SKIP_DOMAIN default ourosmaterials.com (your own team's views don't email you)
 import { IV, DATA } from "./_deck-data.js";
+import { ASSETS } from "./_deck-assets.js";
 
 export const config = { runtime: "edge" };
 
@@ -46,6 +47,10 @@ export default async function handler(request, context) {
     const r = await sendEmail(visitOf(session.e, request), "tested email alerts on", true);
     return text(r.ok ? `Test email sent to ${process.env.DECK_NOTIFY_EMAIL || CONTACT}. Check your inbox (and spam).` : `Resend refused the email (HTTP ${r.status}): ${r.body}`);
   }
+
+  // Signed-in media: /deck?asset=<name>, decrypted from public/media/deck/*.enc
+  const asset = url.searchParams.get("asset");
+  if (asset) return serveAsset(asset, request, url);
 
   try {
     const headers = new Headers(htmlHeaders());
@@ -111,6 +116,35 @@ const unb64u = (s) => {
   const t = s.replace(/-/g, "+").replace(/_/g, "/");
   return fromB64(t + "=".repeat((4 - (t.length % 4)) % 4));
 };
+
+const assetCache = new Map();
+async function serveAsset(name, request, url) {
+  const meta = ASSETS[name];
+  if (!meta) return new Response("Not found", { status: 404 });
+  try {
+    let buf = assetCache.get(name);
+    if (!buf) {
+      const r = await fetch(new URL(meta.path, url.origin));
+      if (!r.ok) return new Response("Not found", { status: 404 });
+      const sealed = new Uint8Array(await r.arrayBuffer());
+      const key = await crypto.subtle.importKey("raw", fromB64(process.env.DECK_KEY), "AES-GCM", false, ["decrypt"]);
+      buf = new Uint8Array(await crypto.subtle.decrypt({ name: "AES-GCM", iv: sealed.slice(0, 12) }, key, sealed.slice(12)));
+      assetCache.set(name, buf);
+    }
+    const base = { "content-type": meta.type, "Accept-Ranges": "bytes", "Cache-Control": "private, max-age=86400", "X-Robots-Tag": "noindex" };
+    const m = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") || "");
+    if (m && (m[1] || m[2])) {
+      let start = m[1] ? +m[1] : Math.max(0, buf.length - +m[2]);
+      let end = m[1] && m[2] ? Math.min(+m[2], buf.length - 1) : buf.length - 1;
+      if (start >= buf.length || start > end) return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${buf.length}` } });
+      return new Response(buf.slice(start, end + 1), { status: 206, headers: { ...base, "Content-Range": `bytes ${start}-${end}/${buf.length}`, "Content-Length": String(end - start + 1) } });
+    }
+    return new Response(buf, { headers: { ...base, "Content-Length": String(buf.length) } });
+  } catch (e) {
+    console.error("asset decrypt failed", e);
+    return new Response("Unavailable", { status: 500 });
+  }
+}
 
 let cachedHtml;
 async function deckHtml() {
