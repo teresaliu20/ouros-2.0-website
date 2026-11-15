@@ -27,6 +27,14 @@
     {
       "source": "/deck-teaser/logout",
       "destination": "/api/teaser?action=logout"
+    },
+    {
+      "source": "/deck-impact",
+      "destination": "/api/impact"
+    },
+    {
+      "source": "/deck-impact/logout",
+      "destination": "/api/impact?action=logout"
     }
   ],
   "headers": [
